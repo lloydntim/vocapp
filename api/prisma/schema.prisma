@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client"
+   output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum Direction {
+  LTR
+  RTL
+}
+enum TokenPurpose {
+  PASSWORD_RESET @map("password_reset")
+  VERIFY_ACCOUNT @map("account_verification")
+}
+
+enum UserPlan {
+  PAID
+  FREE
+}
+
+model User {
+  id String  @id @default(uuid()) @db.Uuid
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  email      String   @unique
+  username   String   @unique
+  isVerified Boolean @default(false) @map("is_verified")
+  role UserRole @default(USER)
+  plan UserPlan @default(FREE)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  credential       Credential?
+  refreshTokens    RefreshToken[]
+  tokens           Token[]
+  vocabularyLists  VocabularyList[]
+  practiceSessions PracticeSession[]
+
+  @@map("users")
+}
+
+model Credential {
+  id String  @id @default(uuid()) @db.Uuid
+  userId String @unique @map("user_id") @db.Uuid
+  passwordHash String   @map("password_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("credentials")
+}
+
+
+model RefreshToken {
+  id String  @id @default(uuid()) @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  tokenHash String       @unique @map("token_hash")
+  expiresAt DateTime     @map("expires_at")
+  revokedAt DateTime?    @map("revoked_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+
+  @@map("refresh_tokens")
+}
+
+
+model Token {
+  id String  @id @default(uuid()) @db.Uuid
+  userId    String       @map("user_id") @db.Uuid
+  tokenHash String       @unique @map("token_hash")
+  purpose   TokenPurpose
+  expiresAt DateTime     @map("expires_at")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([purpose])
+  @@index([expiresAt])
+
+  @@map("tokens")
+}
+
+model Language {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  code      String    @unique
+  direction Direction
+
+  sourceLists VocabularyList[] @relation("SourceLanguage")
+  targetLists VocabularyList[] @relation("TargetLanguage")
+
+  @@map("languages")
+}
+
+model VocabularyList {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  sourceLanguageId String    @map("source_language_id") @db.Uuid
+  targetLanguageId String    @map("target_language_id") @db.Uuid
+  name             String
+  deletedAt        DateTime? @map("deleted_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceLanguage Language @relation("SourceLanguage", fields: [sourceLanguageId], references: [id])
+  targetLanguage Language @relation("TargetLanguage", fields: [targetLanguageId], references: [id])
+
+  items            VocabularyListItem[]
+  practiceSessions PracticeSession[]
+
+  @@index([userId])
+  @@index([sourceLanguageId])
+
+  @@map("vocabulary_lists")
+}
+
+model VocabularyListItem {
+  id               String    @id @default(uuid()) @db.Uuid
+  listId           String    @map("list_id") @db.Uuid
+  position Int
+  list VocabularyList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  practiceResults PracticeResult[]
+
+  sourceText String   @map("source_text")
+  targetText String   @map("target_text")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([listId, position])
+  @@index([listId])
+
+  @@map("vocabulary_list_items")
+}
+
+model PracticeResult {
+  id         String   @id @default(uuid()) @db.Uuid
+  sessionId  String   @map("session_id") @db.Uuid
+  itemId     String?  @map("item_id") @db.Uuid
+  sourceText String   @map("source_text")
+  targetText String   @map("target_text")
+  isCorrect  Boolean  @map("is_correct")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  session PracticeSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  item    VocabularyListItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+  @@index([itemId])
+  @@index([isCorrect])
+
+  @@map("practice_results")
+}
+
+model PracticeSession {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  listId      String    @map("list_id") @db.Uuid
+  startedAt   DateTime  @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list    VocabularyList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  results PracticeResult[]
+
+  @@map("practice_sessions")
+}

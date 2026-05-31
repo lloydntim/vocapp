@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Generated files
+src/generated/
+api/src/generated/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Prisma
+*.db
+*.db-journal
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Claude
+CLAUDE.md
+**/CLAUDE.md

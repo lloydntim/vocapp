@@ -1,0 +1,3 @@
+packages:
+  - 'api'
+minimumReleaseAge: 1440
