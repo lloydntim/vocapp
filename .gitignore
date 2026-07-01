@@ -5,7 +5,8 @@ node_modules/
 dist/
 
 # Generated files
-src/generated/
+generated/
+api/generated/
 api/src/generated/
 
 # Environment variables
@@ -16,6 +17,9 @@ api/src/generated/
 # Prisma
 *.db
 *.db-journal
+
+# Mailpit local data
+api/mailpit-data/
 
 # TypeScript
 *.tsbuildinfo
