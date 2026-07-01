@@ -6,11 +6,11 @@ function authenticate(req: Request, _res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return next(new UnauthorizedError('No authorisation header provided'));
+    throw new UnauthorizedError('No authorisation header provided');
   }
 
   if (!authHeader.startsWith('Bearer')) {
-    return next(new UnauthorizedError('No token provided'));
+    throw new UnauthorizedError('No token provided');
   }
 
   const token = authHeader.slice('Bearer '.length);
@@ -18,6 +18,7 @@ function authenticate(req: Request, _res: Response, next: NextFunction) {
   const decoded = tokenService.verifyAccessToken(token);
 
   req.user = decoded;
+
   next();
 }
 

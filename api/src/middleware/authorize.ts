@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
+import { ForbiddenError } from '../errors/ForbiddenError.js';
 import { UnauthorizedError } from '../errors/UnauthorizedError.js';
-import type { UserRole } from '../shared/types/user.types.js';
+import type { UserRole } from '../generated/prisma/client.js';
 
 function authorize(role: UserRole) {
   return (req: Request, _res: Response, next: NextFunction) => {
@@ -9,8 +10,9 @@ function authorize(role: UserRole) {
     }
 
     if (req.user.role !== role) {
-      throw new UnauthorizedError('User does not have permissions');
+      throw new ForbiddenError('User does not have permissions');
     }
+
     next();
   };
 }
