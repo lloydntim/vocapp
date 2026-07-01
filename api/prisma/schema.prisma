@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-   output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -60,7 +60,6 @@ model Credential {
   @@map("credentials")
 }
 
-
 model RefreshToken {
   id String  @id @default(uuid()) @db.Uuid
   userId    String       @map("user_id") @db.Uuid
@@ -90,6 +89,8 @@ model Token {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, purpose])
+
   @@index([userId, purpose])
   @@index([purpose])
   @@index([expiresAt])
@@ -112,16 +113,18 @@ model Language {
 model VocabularyList {
   id               String    @id @default(uuid()) @db.Uuid
   userId           String    @map("user_id") @db.Uuid
-  sourceLanguageId String    @map("source_language_id") @db.Uuid
-  targetLanguageId String    @map("target_language_id") @db.Uuid
+  sourceLanguageId String?   @map("source_language_id") @db.Uuid
+  targetLanguageId String?   @map("target_language_id") @db.Uuid
+  sourceLanguageCode String  @map("source_language_code")
+  targetLanguageCode String  @map("target_language_code")
   name             String
   deletedAt        DateTime? @map("deleted_at")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sourceLanguage Language @relation("SourceLanguage", fields: [sourceLanguageId], references: [id])
-  targetLanguage Language @relation("TargetLanguage", fields: [targetLanguageId], references: [id])
+  sourceLanguage Language? @relation("SourceLanguage", fields: [sourceLanguageId], references: [id])
+  targetLanguage Language? @relation("TargetLanguage", fields: [targetLanguageId], references: [id])
 
   items            VocabularyListItem[]
   practiceSessions PracticeSession[]
@@ -157,7 +160,12 @@ model PracticeResult {
   itemId     String?  @map("item_id") @db.Uuid
   sourceText String   @map("source_text")
   targetText String   @map("target_text")
-  isCorrect  Boolean  @map("is_correct")
+  startedAt  DateTime  @map("started_at")
+  completedAt  DateTime?  @map("completed_at")
+  hints Int   @default(0)
+  errors Int   @default(0)
+  skipped Boolean  @default(false)
+
   createdAt  DateTime @default(now()) @map("created_at")
 
   session PracticeSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -165,7 +173,6 @@ model PracticeResult {
 
   @@index([sessionId])
   @@index([itemId])
-  @@index([isCorrect])
 
   @@map("practice_results")
 }
@@ -178,6 +185,9 @@ model PracticeSession {
   completedAt DateTime? @map("completed_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  totalHints Int   @default(0)
+  totalErrors Int   @default(0)
+  totalSkipped Int   @default(0)
 
   user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   list    VocabularyList @relation(fields: [listId], references: [id], onDelete: Cascade)
