@@ -1,11 +1,14 @@
 import type { Request, Response } from 'express';
-import type User from '../../shared/types/user.types.js';
-import type { UserInput } from '../users/user.types.js';
+import type { User } from '../../generated/prisma/client.js';
+import type { CreateUserInput } from '../users/user.schema.js';
 
+import env from '../../config/env.js';
 import logger from '../../config/logger.js';
 import { BadRequestError } from '../../errors/BadRequestError.js';
 
 import { UnauthorizedError } from '../../errors/UnauthorizedError.js';
+import EmailService from '../../shared/email/email.service.js';
+import { NodeMailerProvider } from '../../shared/email/nodemailer.provider.js';
 import {
   loginUser,
   logoutUser,
@@ -23,7 +26,7 @@ interface AuthCookies {
   refreshToken: string;
 }
 
-type UserResponseData = Omit<User, 'password'>;
+type UserResponseData = User;
 
 type AuthRequest<P = NoParams, ResBody = AuthResponse, ReqBody = unknown> = Omit<
   Request<P, ResBody, ReqBody>,
@@ -36,27 +39,34 @@ interface AuthResponse {
   message?: string;
 }
 
+const emailService = new EmailService(new NodeMailerProvider());
+
 const REFRESH_TOKEN_COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: true, // HTTPS only
-  sameSite: 'strict', // CSRF protection
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  path: '/api/auth', // Only sent to auth routes
-} as const;
+  secure: env.NODE_ENV === 'production',
+  sameSite: env.NODE_ENV === 'production' ? ('strict' as const) : ('lax' as const),
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: '/api/v1/auth',
+};
+
+const REFRESH_TOKEN_CLEAR_OPTIONS = {
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  path: '/api/v1/auth',
+};
 
 async function register(
-  req: Request<NoParams, AuthResponse, UserInput>,
+  req: Request<NoParams, AuthResponse, CreateUserInput>,
   res: Response<AuthResponse>,
 ) {
-  const { firstName, lastName, username, email, password } = req.body;
+  const { verificationToken, userData } = await registerUser(req.body);
+  const verificationUrl = `${env.CLIENT_URL}/verify?token=${verificationToken}`;
 
-  if (!firstName || !lastName || !username || !email || !password) {
-    logger.warn('Form data is invalid');
-
-    throw new BadRequestError('Form fields are incomplete');
-  }
-
-  const { userData } = await registerUser(req.body);
+  emailService.sendVerificationEmail({
+    to: userData.email,
+    verificationUrl,
+  });
 
   res.status(201).json({
     message: 'User was created',
@@ -69,12 +79,6 @@ async function login(
   res: Response<AuthResponse>,
 ) {
   const { username, password } = req.body;
-
-  if (!username || !password) {
-    logger.warn('Form data is invalid');
-
-    throw new BadRequestError('Form fields are incomplete');
-  }
 
   const { accessToken, refreshToken, userData } = await loginUser({
     username,
@@ -90,19 +94,21 @@ async function login(
   });
 }
 
-function logout(req: AuthRequest, res: Response) {
+async function logout(req: AuthRequest, res: Response) {
   const { refreshToken } = req.cookies;
 
-  logoutUser(refreshToken);
+  if (refreshToken) {
+    await logoutUser(refreshToken);
+  }
 
-  res.cookie('refreshToken', '');
+  res.clearCookie('refreshToken', REFRESH_TOKEN_CLEAR_OPTIONS);
 
   return res.status(200).json({
     message: 'Logged out successfully',
   });
 }
 
-function forgotPassword(
+async function forgotPassword(
   req: Request<NoParams, AuthResponse, ForgotPasswordInput>,
   res: Response<AuthResponse>,
 ) {
@@ -114,25 +120,27 @@ function forgotPassword(
     throw new BadRequestError('Form fields are incomplete');
   }
 
-  const { rawResetToken: resetToken } = requestPasswordReset({ email });
+  const { rawResetToken: resetToken } = await requestPasswordReset({ email });
+
+  const resetUrl = `${env.CLIENT_URL}/reset?token=${resetToken}`;
+
+  emailService.sendResetPasswordEmail({
+    to: email,
+    resetUrl,
+  });
+
+  logger.info('Password reset process has been started');
 
   res.status(200).json({
-    message: `https://www.vocapp.com/res-et?token=${resetToken}`, // message: 'Reset link sent to user',
+    message: 'Password reset process has been started', // message: 'Reset link sent to user',
   });
 }
 
 async function resetPassword(
-  req: Request<{ token: string }, AuthResponse, UserInput>,
+  req: Request<NoParams, AuthResponse, CreateUserInput & { token: string }>,
   res: Response<AuthResponse>,
 ) {
-  // get temporary token
-  const { token } = req.params;
-
-  if (!token) {
-    throw new UnauthorizedError('Token not valid or expired');
-  }
-
-  const { password } = req.body;
+  const { token, password } = req.body;
 
   if (!password) {
     throw new BadRequestError('Form fields are incomplete');
@@ -164,19 +172,18 @@ async function refresh(req: AuthRequest<NoParams, AuthResponse>, res: Response<A
   res.status(200).json({ accessToken: newAccessToken });
 }
 
-async function verify(req: AuthRequest<NoParams, AuthResponse>, res: Response<AuthResponse>) {
-  const { refreshToken } = req.cookies;
+async function verify(req: Request, res: Response<AuthResponse>) {
+  const { token } = req.body;
 
-  if (!refreshToken) {
-    throw new UnauthorizedError('No refresh token', 'NO_REFRESH_TOKEN');
+  if (!token) {
+    throw new UnauthorizedError('Verify Token invalid or expired');
   }
 
-  const { newAccessToken, newRefreshToken } = await verifyUser(refreshToken);
+  const { newAccessToken, newRefreshToken, userId } = await verifyUser(token);
 
-  // set cookie with new refresh token
   res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-  // return access token
+  logger.info({ userId }, 'User has been verified');
   res.status(200).json({ accessToken: newAccessToken, message: 'User has been verified' });
 }
 

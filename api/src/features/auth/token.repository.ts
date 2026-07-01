@@ -1,59 +1,48 @@
 import logger from '../../config/logger.js';
-import { BadRequestError } from '../../errors/BadRequestError.js';
-import { NotFoundError } from '../../errors/NotFoundError.js';
-import { TOKEN_PURPOSES, type Token, type TokenPurpose } from '../auth/auth.types.js';
+import prisma from '../../db/client.js';
+import { Token, TokenPurpose } from '../../generated/prisma/client.js';
+import { handlePrismaError } from '../../utils/handlePrismaError.js';
 
-const mockTokens = [
-  {
-    id: '01',
-    user_id: '12',
-    token_hash: '23093',
-    purpose: TOKEN_PURPOSES.RESET_PASSWORD as TokenPurpose,
-    expires_at: new Date('2099-01-01'),
-  },
-  {
-    id: '02',
-    user_id: '13',
-    token_hash: '39485',
-    purpose: TOKEN_PURPOSES.RESET_PASSWORD as TokenPurpose,
-    expires_at: new Date(Date.now() + 15 * 60 * 1000),
-  },
-];
+type TokenInput = Pick<Token, 'userId' | 'tokenHash' | 'purpose' | 'expiresAt'>;
 
-function findTokenByUserId(userId: string): Token | undefined {
-  const existingToken = mockTokens.find(({ user_id }) => user_id === userId);
-
-  // if (!existingToken) {
-  //   throw new NotFoundError('Token cannot be found');
-  // }
-
-  return existingToken;
+async function findTokenByUserId(userId: string): Promise<Token> {
+  return handlePrismaError(prisma.token.findFirstOrThrow({ where: { userId } }), {
+    P2025: 'Token does not exist',
+  });
 }
 
-function findValidToken(hashedToken: string): Token {
-  const validToken = mockTokens.find(({ token_hash }) => token_hash === hashedToken);
+async function findTokenByHash(tokenHash: string, purpose: TokenPurpose): Promise<Token | null> {
+  const token = await prisma.token.findUnique({ where: { tokenHash } });
 
-  if (!validToken) {
-    throw new NotFoundError('Token cannot be found');
-  }
-
-  return validToken;
+  return token?.purpose === purpose ? token : null;
 }
 
-function addToken(token: Token): Token {
-  const existingToken = findTokenByUserId(token.user_id);
+async function upsertToken(data: TokenInput): Promise<Token> {
+  const token = await handlePrismaError(
+    prisma.token.upsert({
+      where: { userId_purpose: { userId: data.userId, purpose: data.purpose } },
+      create: data,
+      update: { tokenHash: data.tokenHash, expiresAt: data.expiresAt },
+    }),
+  );
 
-  if (existingToken) {
-    throw new BadRequestError('User could not be added');
-  }
+  logger.info(
+    {
+      userId: token.userId,
+      tokenId: token.id,
+      purpose: token.purpose,
+    },
 
-  const newToken = { ...token, id: Date.now().toString() };
+    'Token was upserted',
+  );
 
-  mockTokens.push(newToken);
-
-  logger.info({ tokenId: token.id }, 'Token was created');
-
-  return newToken;
+  return token;
 }
 
-export default { addToken, findTokenByUserId, findValidToken };
+async function deleteToken(id: string): Promise<void> {
+  await handlePrismaError(prisma.token.delete({ where: { id } }), {
+    P2025: 'Token does not exist',
+  });
+}
+
+export default { upsertToken, findTokenByUserId, findTokenByHash, deleteToken };

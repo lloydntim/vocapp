@@ -1,6 +1,6 @@
 import type { JwtPayload } from 'jsonwebtoken';
-import type { UserRole } from '../../shared/types/user.types.js';
-import type { UserInput } from '../users/user.types.js';
+import type { UserRole } from '../../generated/prisma/client.js';
+import type { CreateUserInput } from '../users/user.schema.js';
 
 export interface AuthenticatedUser extends JwtPayload {
   email: string;
@@ -23,5 +23,5 @@ export interface Token {
   purpose: TokenPurpose;
 }
 
-export type LoginInput = Required<Pick<UserInput, 'username' | 'password'>>;
-export type ForgotPasswordInput = Required<Pick<UserInput, 'email'>>;
+export type LoginInput = Required<Pick<CreateUserInput, 'username' | 'password'>>;
+export type ForgotPasswordInput = Required<Pick<CreateUserInput, 'email'>>;

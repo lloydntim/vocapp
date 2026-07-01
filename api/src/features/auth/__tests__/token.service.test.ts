@@ -1,6 +1,7 @@
 // src/shared/token/token.service.test.ts
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { UserRole } from '../../../generated/prisma/enums.js';
 import tokenService from '../token.service.js';
 
 describe('tokenService', () => {
@@ -9,16 +10,7 @@ describe('tokenService', () => {
       const payload = tokenService.generateAccessToken({
         id: 'user_123',
         email: 'lloyd@example.com',
-        role: 'user',
-      });
-      expect(payload).toBeTypeOf('string');
-    });
-
-    it('generates refresh token', () => {
-      const payload = tokenService.generateRefreshToken({
-        id: 'user_123',
-        email: 'lloyd@example.com',
-        role: 'user',
+        role: UserRole.USER,
       });
       expect(payload).toBeTypeOf('string');
     });
@@ -56,30 +48,14 @@ describe('tokenService', () => {
       const token = tokenService.generateAccessToken({
         id: 'user_123',
         email: 'lloyd@example.com',
-        role: 'user',
+        role: UserRole.USER,
       });
 
       const payload = tokenService.verifyAccessToken(token);
 
       expect(payload.sub).toBe('user_123');
       expect(payload.email).toBe('lloyd@example.com');
-      expect(payload.role).toBe('user');
-      expect(payload.exp).toBeTypeOf('number');
-      expect(payload.iat).toBeTypeOf('number');
-    });
-
-    it('signs and verifies a refresh token', () => {
-      const token = tokenService.generateRefreshToken({
-        id: 'user_123',
-        email: 'lloyd@example.com',
-        role: 'user',
-      });
-
-      const payload = tokenService.verifyRefreshToken(token);
-
-      expect(payload.sub).toBe('user_123');
-      expect(payload.email).toBe('lloyd@example.com');
-      expect(payload.role).toBe('user');
+      expect(payload.role).toBe(UserRole.USER);
       expect(payload.exp).toBeTypeOf('number');
       expect(payload.iat).toBeTypeOf('number');
     });
@@ -88,14 +64,14 @@ describe('tokenService', () => {
       const token = tokenService.generateAccessToken({
         id: 'user_123',
         email: 'lloyd@example.com',
-        role: 'user',
+        role: UserRole.USER,
       });
 
       const payload = tokenService.verifyAccessToken(token);
 
       expect(payload.sub).toBe('user_123');
       expect(payload.email).toBe('lloyd@example.com');
-      expect(payload.role).toBe('user');
+      expect(payload.role).toBe(UserRole.USER);
       expect(payload.exp).toBeTypeOf('number');
       expect(payload.iat).toBeTypeOf('number');
     });
@@ -114,31 +90,13 @@ describe('tokenService', () => {
       const token = tokenService.generateAccessToken({
         id: 'user_123',
         email: 'lloyd@example.com',
-        role: 'user',
+        role: UserRole.USER,
       });
 
       vi.setSystemTime(new Date('2026-01-01T10:03:00Z'));
 
       expect(() => {
         tokenService.verifyAccessToken(token);
-      }).toThrow();
-    });
-
-    it('throws when the refresh token has expired', () => {
-      vi.useFakeTimers();
-
-      vi.setSystemTime(new Date('2026-01-01T10:00:00Z'));
-
-      const token = tokenService.generateRefreshToken({
-        id: 'user_123',
-        email: 'lloyd@example.com',
-        role: 'user',
-      });
-
-      vi.setSystemTime(new Date('2026-01-01T12:00:00Z'));
-
-      expect(() => {
-        tokenService.verifyRefreshToken(token);
       }).toThrow();
     });
   });
