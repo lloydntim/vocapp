@@ -1,0 +1,126 @@
+import swaggerJsdoc from 'swagger-jsdoc';
+
+const swaggerSpec = swaggerJsdoc({
+  definition: {
+    openapi: '3.0.3',
+    info: {
+      title: 'VocApp API',
+      version: '2.1.0',
+      description: 'REST API documentation for VocApp',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/api/v1',
+        description: 'Local development - v1',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+      schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+            },
+            firstName: {
+              type: 'string',
+              example: 'John',
+            },
+            lastName: {
+              type: 'string',
+              example: 'Doe',
+            },
+            username: {
+              type: 'string',
+              example: 'johndoe',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'john@example.com',
+            },
+            role: {
+              type: 'string',
+              example: 'USER',
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+            },
+          },
+        },
+        VocabularyList: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            userId: { type: 'string', format: 'uuid' },
+            sourceLanguageCode: { type: 'string', example: 'en' },
+            targetLanguageCode: { type: 'string', example: 'fr' },
+            name: { type: 'string', example: 'French Vocabulary Notes' },
+            deletedAt: { type: 'string', format: 'date-time', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        VocabularyListItem: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            listId: { type: 'string', format: 'uuid' },
+            position: { type: 'integer', example: 1 },
+            sourceText: { type: 'string', example: 'apple' },
+            targetText: { type: 'string', example: 'la pomme' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        PracticeSession: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            userId: { type: 'string', format: 'uuid' },
+            listId: { type: 'string', format: 'uuid' },
+            startedAt: { type: 'string', format: 'date-time' },
+            completedAt: { type: 'string', format: 'date-time', nullable: true },
+            totalHints: { type: 'integer', example: 2 },
+            totalErrors: { type: 'integer', example: 1 },
+            totalSkipped: { type: 'integer', example: 0 },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        PracticeResult: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            sessionId: { type: 'string', format: 'uuid' },
+            itemId: { type: 'string', format: 'uuid', nullable: true },
+            sourceText: { type: 'string', example: 'apple' },
+            targetText: { type: 'string', example: 'la pomme' },
+            startedAt: { type: 'string', format: 'date-time' },
+            completedAt: { type: 'string', format: 'date-time', nullable: true },
+            hints: { type: 'integer', example: 0 },
+            errors: { type: 'integer', example: 1 },
+            skipped: { type: 'boolean', example: false },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+      },
+    },
+  },
+  apis: ['src/features/**/*.routes.ts'],
+});
+
+export default swaggerSpec;
