@@ -1,83 +1,83 @@
 import logger from '../../config/logger.js';
-import type User from '../../shared/types/user.types.js';
 
-export const mockUsers: User[] = [
-  {
-    id: '01',
-    first_name: 'John',
-    last_name: 'Doe',
-    email: 'jdoe@mail.com',
-    username: 'jdoe',
-    password: 'secret',
-    is_verified: true,
-    role: 'admin',
-  },
-  {
-    id: '02',
-    first_name: 'Joe',
-    last_name: 'Bloggs',
-    email: 'jbloggs@mail.com',
-    username: 'jbloggs',
-    password: 'secret1',
-    is_verified: false,
-    role: 'user',
-  },
-];
+import prisma from '../../db/client.js';
+import type { Credential, Prisma, User } from '../../generated/prisma/client.js';
+import { handlePrismaError } from '../../utils/handlePrismaError.js';
 
-function getUsers(): User[] {
-  return mockUsers;
+type UserWithCredential = Prisma.UserGetPayload<{ include: { credential: true } }>;
+
+async function findUsers(): Promise<User[]> {
+  return prisma.user.findMany();
 }
 
-function findUser({
-  username = '',
-  email = '',
-}: Pick<User, 'username' | 'email'>): User | undefined {
-  if (!username) {
-    throw Error('Username required');
+async function findUserByEmailOrUsername(identifier: string): Promise<UserWithCredential | null> {
+  const normalizedIdentifier = identifier.trim().toLowerCase();
+
+  if (!normalizedIdentifier) {
+    return null;
   }
-  return mockUsers.find((user) => user.username === username || user.email === email);
+
+  return prisma.user.findFirst({
+    where: {
+      OR: [{ email: normalizedIdentifier }, { username: normalizedIdentifier }],
+    },
+    include: { credential: true },
+  });
 }
 
-function findUserById(id = ''): User {
-  if (!id) {
-    throw Error('id required');
-  }
-  const user = mockUsers.find((user) => user.id === id);
-
-  if (!user) {
-    throw Error('User does not exist');
-  }
-
-  const { password: _password, ...userData } = user;
-
-  return userData;
+async function findUserById(userId: string): Promise<User> {
+  return handlePrismaError(prisma.user.findUniqueOrThrow({ where: { id: userId } }), {
+    P2025: 'User does not exist',
+  });
 }
 
-function addUser(user: Omit<User, 'id'>): User {
-  const existingUser = findUser({ username: user.username ?? '' });
-
-  if (existingUser) {
-    throw Error('User could not be added');
-  }
-
-  const newUser = { ...user, id: Date.now().toString(), role: 'user' as const };
-
-  mockUsers.push(newUser);
+async function addUser(
+  data: Pick<User, 'firstName' | 'lastName' | 'email' | 'username'>,
+  passwordHash: string,
+): Promise<User> {
+  const newUser = await handlePrismaError(
+    prisma.user.create({
+      data: {
+        ...data,
+        credential: { create: { passwordHash } },
+      },
+    }),
+    { P2002: 'User already exists' },
+  );
 
   logger.info({ userId: newUser.id }, 'User was created');
 
   return newUser;
 }
 
-function updateUser(id: string, props: Partial<Omit<User, 'id'>>) {
-  const user = findUserById(id);
-
-  if (user) {
-    const userItemIndex = mockUsers.findIndex((user) => user.id === id);
-    mockUsers[userItemIndex] = { ...mockUsers[userItemIndex], ...props } as User;
-  }
-
-  return user;
+async function updateUser(userId: string, data: Partial<Omit<User, 'id'>>): Promise<User> {
+  return handlePrismaError(prisma.user.update({ where: { id: userId }, data }), {
+    P2025: 'User does not exist',
+  });
 }
 
-export default { getUsers, findUser, findUserById, addUser, updateUser };
+async function deleteUser(userId: string): Promise<void> {
+  await handlePrismaError(prisma.user.delete({ where: { id: userId } }), {
+    P2025: 'User does not exist',
+  });
+}
+
+async function updateCredential(userId: string, passwordHash: string): Promise<Credential> {
+  return handlePrismaError(
+    prisma.credential.update({
+      where: { userId },
+      data: { passwordHash },
+    }),
+    { P2025: 'Credential does not exist' },
+  );
+}
+
+export default {
+  findUsers,
+  findUserByEmailOrUsername,
+  findUserById,
+  addUser,
+  updateUser,
+  deleteUser,
+  updateCredential,
+};
