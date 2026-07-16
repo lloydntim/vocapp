@@ -1,6 +1,6 @@
 'use client';
 
-import Form from '@/components/ui/Form/Form';
+import Form, { InputDataItem } from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
 import Text from '@/components/ui/Text/Text';
 import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
@@ -12,7 +12,7 @@ import {
 
 const authHeaderLinkText = <Link href="/login">Back to log in</Link>;
 
-const formFields = [
+const formFields: InputDataItem<ForgotPasswordFormValues>[] = [
   {
     schemaKey: 'email',
     id: 'email',
@@ -22,7 +22,7 @@ const formFields = [
     autoComplete: 'email',
   },
 ];
-const onSubmit = (data: unknown | ForgotPasswordFormValues) => {
+const onSubmit = (data: ForgotPasswordFormValues) => {
   console.log('data', data);
 };
 

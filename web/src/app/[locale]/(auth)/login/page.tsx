@@ -1,11 +1,15 @@
 'use client';
 
-import Form from '@/components/ui/Form/Form';
+import { useRouter } from '@/i18n/navigation';
+import { useLogin } from '@/features/auth/hooks/useAuthMutations';
+
+import Form, { InputDataItem } from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
 import Text from '@/components/ui/Text/Text';
 import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
 import { loginSchema, LoginFormValues } from '@/features/auth/schemas';
+import { ApiError } from '@/lib/client-api';
 
 const authHeaderLinkText = (
   <Text>
@@ -13,11 +17,7 @@ const authHeaderLinkText = (
   </Text>
 );
 
-const onSubmit = (data: unknown | LoginFormValues) => {
-  console.log('data', data);
-};
-
-const formFields = [
+const formFields: InputDataItem<LoginFormValues>[] = [
   {
     schemaKey: 'username',
     id: 'username',
@@ -37,7 +37,24 @@ const formFields = [
   },
 ];
 
-function page() {
+function LoginPage() {
+  const router = useRouter();
+  const loginMutation = useLogin();
+
+  const onSubmit = (data: LoginFormValues) => {
+    loginMutation.mutate(data, {
+      onSuccess: () => {
+        router.push('/dashboard');
+        router.refresh();
+      },
+    });
+  };
+
+  const errorMessage =
+    loginMutation.error instanceof ApiError
+      ? loginMutation.error.message
+      : null;
+
   return (
     <AuthFormColumn authHeaderLink={authHeaderLinkText}>
       <AuthCard
@@ -46,12 +63,15 @@ function page() {
           subtitle: 'Login to your account to continue.',
         }}
         content={
-          <Form
-            schema={loginSchema}
-            fields={formFields}
-            submitButtonText="Login"
-            submitButtonHandler={onSubmit}
-          />
+          <>
+            {errorMessage && <Text role="alert">{errorMessage}</Text>}
+            <Form
+              schema={loginSchema}
+              fields={formFields}
+              submitButtonText="Login"
+              submitButtonHandler={onSubmit}
+            />
+          </>
         }
         hasDivider
         dividerText="or"
@@ -68,4 +88,4 @@ function page() {
   );
 }
 
-export default page;
+export default LoginPage;

@@ -1,13 +1,13 @@
 'use client';
 
-import Form from '@/components/ui/Form/Form';
+import Form, { InputDataItem } from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
 import Text from '@/components/ui/Text/Text';
 import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
 import { SignupFormValues, signupSchema } from '@/features/auth/schemas';
 
-const formFields = [
+const formFields: InputDataItem<SignupFormValues>[] = [
   {
     schemaKey: 'firstName',
     id: 'first-name',
@@ -67,7 +67,7 @@ const authHeaderLinkText = (
   </Text>
 );
 
-const onSubmit = (data: unknown | SignupFormValues) => {
+const onSubmit = (data: SignupFormValues) => {
   console.log('data', data);
 };
 
