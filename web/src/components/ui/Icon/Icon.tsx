@@ -1,0 +1,110 @@
+import {
+  LucideIcon,
+  LucideProps,
+  Moon,
+  Sun,
+  ArrowRight,
+  Book,
+  Play,
+  BarChart2,
+  Sparkle,
+  Sparkles,
+  Flame,
+  Check,
+  User,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  CircleAlert,
+  AtSign,
+  Signature,
+  UserRound,
+  House,
+  ChartNoAxesColumnIncreasing,
+  LogIn,
+  LogOut,
+  Settings,
+  Menu,
+  ChevronRight,
+  Search,
+  Funnel,
+  SquarePen,
+  Trash2,
+  Plus,
+  Volume1,
+  ArrowLeft,
+  Shuffle,
+  Repeat,
+  Repeat2,
+  ChevronLeft,
+  ChevronDown,
+  ChevronUp,
+  NotepadText,
+  Volume,
+  X,
+  PenLine,
+} from 'lucide-react';
+import { ComponentType } from 'react';
+
+export interface IconProps extends LucideProps {
+  type?: string;
+  className?: string;
+}
+
+const iconMap = {
+  moon: Moon,
+  sun: Sun,
+  check: Check,
+  'arrow-right': ArrowRight,
+  book: Book,
+  play: Play,
+  'bar-chart2': BarChart2,
+  sparkle: Sparkle,
+  sparkles: Sparkles,
+  flame: Flame,
+  user: User,
+  mail: Mail,
+  lock: Lock,
+  eye: Eye,
+  'eye-off': EyeOff,
+  'circle-alert': CircleAlert,
+  'at-sign': AtSign,
+  signature: Signature,
+  'user-round': UserRound,
+  house: House,
+  'chart-no-axes': ChartNoAxesColumnIncreasing,
+  'log-in': LogIn,
+  'log-out': LogOut,
+  settings: Settings,
+  menu: Menu,
+  'chevron-right': ChevronRight,
+  search: Search,
+  funnel: Funnel,
+  'square-pen': SquarePen,
+  'trash-2': Trash2,
+  plus: Plus,
+  'volume-1': Volume1,
+  'arrow-left': ArrowLeft,
+  shuffle: Shuffle,
+  repeat: Repeat,
+  repeat2: Repeat2,
+  'chevron-left': ChevronLeft,
+  'chevron-down': ChevronDown,
+  'chevron-up': ChevronUp,
+  'notepad-text': NotepadText,
+  volume: Volume,
+  close: X,
+  'pen-line': PenLine,
+} as Record<string, LucideIcon>;
+
+function Icon({ type = '', ...rest }: IconProps) {
+  const IconSVG = iconMap[type] as ComponentType<LucideProps>;
+
+  if (!type) {
+    return null;
+  }
+  return <IconSVG {...rest} />;
+}
+
+export default Icon;

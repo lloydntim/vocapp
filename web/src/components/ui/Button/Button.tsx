@@ -1,0 +1,151 @@
+'use client';
+
+import { MouseEventHandler, ReactNode, TouchEventHandler } from 'react';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import Icon from '../Icon/Icon';
+
+type ButtonType = 'submit' | 'button' | 'reset';
+type ButtonSize = 'small' | 'base' | 'large';
+type ButtonRank = 'primary' | 'secondary';
+type ButtonVariant =
+  | 'ghost'
+  | 'standard'
+  | 'ghost-danger'
+  | 'outline'
+  | 'danger'
+  | 'outline-danger';
+
+export type { ButtonSize, ButtonRank, ButtonVariant, ButtonType };
+
+export interface ButtonProps {
+  className?: string;
+  variant?: ButtonVariant;
+  disabled?: boolean;
+  title?: string;
+  ariaLabel?: string;
+  children?: ReactNode;
+  type?: ButtonType;
+  tabIndex?: number;
+  rank?: ButtonRank;
+  size?: ButtonSize;
+  isLink?: boolean;
+  to?: string;
+  icon?: string;
+  onClick?: MouseEventHandler;
+  onMouseUp?: MouseEventHandler;
+  onMouseDown?: MouseEventHandler;
+  onMouseLeave?: MouseEventHandler;
+  onTouchStart?: TouchEventHandler;
+  onTouchEnd?: TouchEventHandler;
+}
+
+export default function Button({
+  rank = 'primary',
+  icon = '',
+  size = 'base',
+  variant = 'standard',
+  disabled,
+  children,
+  to = '',
+  className,
+  title = '',
+  ariaLabel = '',
+  onClick,
+  onMouseUp,
+  onMouseDown,
+  onTouchStart,
+  onTouchEnd,
+  type = 'button',
+  isLink = false,
+  ...rest
+}: ButtonProps) {
+  const baseClass = cn(
+    'font-[var(--font-sans)]',
+    'gap-2',
+    'px-4',
+    'justify-center',
+    'font-semibold',
+    'cursor-pointer',
+    'border border-(--border)',
+    'rounded-[10px]',
+    'transition-all duration-(--dur-fast) ease-(--ease)',
+    'inline-flex',
+    'text-sm',
+    'items-center',
+    disabled && 'opacity-50 cursor-not-allowed',
+  );
+
+  const backgroundStyle = (buttonBgStyle: string) =>
+    variant === 'ghost' ? 'bg-transparent' : buttonBgStyle;
+
+  const rankMap: Record<string, string> = {
+    primary: cn(
+      'text-[var(--brand-ink)]',
+      backgroundStyle('bg-(--brand)'),
+      'hover:border-[var(--brand-hover)]',
+      'hover:bg-(--brand-hover)',
+      // 'shadow-[0_1px_2px_rgba(11,93,93,0.25)]',
+    ),
+    secondary: cn(
+      'text-[var(--text)]',
+      backgroundStyle('bg-(--surface)'),
+      'hover:bg-(--surface-alt)',
+    ),
+  };
+
+  const dangerVariantMap: Record<string, string> = {
+    danger: cn(
+      'text-white',
+      'bg-(--danger)',
+      'border-(--danger)',
+      'hover:brightness-90',
+    ),
+    'outline-danger': cn(
+      'text-(--danger)',
+      'bg-transparent',
+      'border-(--danger)',
+      'hover:bg-(--danger-soft)',
+    ),
+  };
+
+  const sizeMap: Record<string, { button: string; icon: number }> = {
+    small: { button: cn('h-10', 'px-4', 'text-sm'), icon: 14 },
+    base: { button: cn('h-12', 'px-6', 'text-base'), icon: 16 },
+    large: { button: cn('h-14', 'px-8', 'text-lg'), icon: 18 },
+  };
+
+  const buttonClassName = cn(
+    baseClass,
+    dangerVariantMap[variant] ?? rankMap[rank],
+    sizeMap[size].button,
+    className,
+  );
+
+  if (isLink) {
+    return (
+      <Link href={to} className={buttonClassName}>
+        {icon && <Icon type={icon} size={sizeMap[size].icon} />}
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      className={buttonClassName}
+      title={title}
+      aria-label={ariaLabel}
+      onClick={onClick}
+      onMouseUp={onMouseUp}
+      onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      {...rest}
+    >
+      {icon && <Icon type={icon} size={sizeMap[size].icon} />}
+      {children}
+    </button>
+  );
+}
