@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { NotFoundError } from '../../../../errors/NotFoundError.js';
+import { VocabularyItemStatus } from '../../../../generated/prisma/enums.js';
 import listRepository from '../../list.repository.js';
 import listItemRepository from '../item.repository.js';
 import listItemService from '../item.service.js';
@@ -16,7 +17,7 @@ vi.mock('../item.repository.js', () => ({
     findVocabListItemByListId: vi.fn(),
     findVocabListItemById: vi.fn(),
     addVocabListItem: vi.fn(),
-    updateVocabListItem: vi.fn(),
+    updateVocabListItemStatus: vi.fn(),
     deleteVocabListItem: vi.fn(),
   },
 }));
@@ -40,6 +41,7 @@ const mockItem = {
   sourceText: 'apple',
   targetText: 'Apfel',
   position: 1,
+  status: VocabularyItemStatus.LEARNING,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -101,5 +103,83 @@ describe('listItemService.addVocabListItem', () => {
         targetText: 'Apfel',
       }),
     ).rejects.toThrow('Vocabulary List for this User does not exist');
+  });
+});
+
+describe('listItemService.updateVocabListItemStatus', () => {
+  it('changes status from LEARNING to MASTERED', async () => {
+    vi.mocked(listRepository.findVocabListByUser).mockResolvedValueOnce(mockList);
+    vi.mocked(listItemRepository.findVocabListItemByListId).mockResolvedValueOnce(mockItem);
+    vi.mocked(listItemRepository.updateVocabListItemStatus).mockResolvedValueOnce({
+      ...mockItem,
+      status: VocabularyItemStatus.MASTERED,
+    });
+
+    const result = await listItemService.updateVocabListItemStatus(
+      'user-id-001',
+      'list-id-001',
+      'item-id-001',
+      VocabularyItemStatus.MASTERED,
+    );
+
+    expect(listItemRepository.updateVocabListItemStatus).toHaveBeenCalledWith(
+      mockItem.id,
+      VocabularyItemStatus.MASTERED,
+    );
+    expect(result.status).toEqual(VocabularyItemStatus.MASTERED);
+  });
+
+  it('changes status from MASTERED back to LEARNING', async () => {
+    const masteredItem = { ...mockItem, status: VocabularyItemStatus.MASTERED };
+    vi.mocked(listRepository.findVocabListByUser).mockResolvedValueOnce(mockList);
+    vi.mocked(listItemRepository.findVocabListItemByListId).mockResolvedValueOnce(masteredItem);
+    vi.mocked(listItemRepository.updateVocabListItemStatus).mockResolvedValueOnce({
+      ...mockItem,
+      status: VocabularyItemStatus.LEARNING,
+    });
+
+    const result = await listItemService.updateVocabListItemStatus(
+      'user-id-001',
+      'list-id-001',
+      'item-id-001',
+      VocabularyItemStatus.LEARNING,
+    );
+
+    expect(listItemRepository.updateVocabListItemStatus).toHaveBeenCalledWith(
+      mockItem.id,
+      VocabularyItemStatus.LEARNING,
+    );
+    expect(result.status).toEqual(VocabularyItemStatus.LEARNING);
+  });
+
+  it('rejects when the list is not owned by the user', async () => {
+    vi.mocked(listRepository.findVocabListByUser).mockRejectedValueOnce(
+      new NotFoundError('Vocabulary List for this User does not exist'),
+    );
+
+    await expect(
+      listItemService.updateVocabListItemStatus(
+        'other-user-id',
+        'list-id-001',
+        'item-id-001',
+        VocabularyItemStatus.MASTERED,
+      ),
+    ).rejects.toThrow('Vocabulary List for this User does not exist');
+  });
+
+  it('rejects when the item is not in the verified list', async () => {
+    vi.mocked(listRepository.findVocabListByUser).mockResolvedValueOnce(mockList);
+    vi.mocked(listItemRepository.findVocabListItemByListId).mockRejectedValueOnce(
+      new NotFoundError('Vocabulary List Item does not exist in this list'),
+    );
+
+    await expect(
+      listItemService.updateVocabListItemStatus(
+        'user-id-001',
+        'list-id-001',
+        'other-item-id',
+        VocabularyItemStatus.MASTERED,
+      ),
+    ).rejects.toThrow('Vocabulary List Item does not exist in this list');
   });
 });

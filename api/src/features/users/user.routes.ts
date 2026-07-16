@@ -5,7 +5,10 @@ import authorize from '../../middleware/authorize.js';
 import authorizeOwner from '../../middleware/authorizeOwner.js';
 import validate from '../../middleware/validate.js';
 import listItemController from '../lists/items/item.controller.js';
-import { addUserListItemSchema } from '../lists/items/item.schema.js';
+import {
+  addUserListItemSchema,
+  updateUserListItemStatusSchema,
+} from '../lists/items/item.schema.js';
 import listController from '../lists/list.controller.js';
 import { addUserListSchema, updateUserListSchema } from '../lists/list.schema.js';
 import { addResultSchema } from '../lists/sessions/results/result.schema.js';
@@ -691,6 +694,14 @@ router.get(
   validate(userListItemParamsSchema),
   authorizeOwner,
   listItemController.getVocabListItemByUserList,
+);
+
+router.patch(
+  '/:userId/lists/:listId/items/:itemId/status',
+  authenticate,
+  validate(updateUserListItemStatusSchema),
+  authorizeOwner,
+  listItemController.updateVocabListItemStatus,
 );
 
 router.delete(

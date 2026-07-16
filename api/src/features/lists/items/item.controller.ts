@@ -59,6 +59,29 @@ async function addVocabListItem(
   });
 }
 
+async function updateVocabListItemStatus(
+  req: Request<
+    { userId: string; listId: string; itemId: string },
+    VocabListItemResponse,
+    { status: 'LEARNING' | 'MASTERED' }
+  >,
+  res: Response<VocabListItemResponse>,
+) {
+  const { userId, listId, itemId } = req.params;
+  const { status } = req.body;
+  const updatedItem = await listItemService.updateVocabListItemStatus(
+    userId,
+    listId,
+    itemId,
+    status,
+  );
+
+  res.status(200).json({
+    message: 'Vocabulary list item status updated successfully',
+    data: updatedItem,
+  });
+}
+
 async function deleteVocabListItem(
   req: Request<
     { userId: string; listId: string; itemId: string },
@@ -81,5 +104,6 @@ export default {
   getVocabListItemsByUserList,
   getVocabListItemByUserList,
   addVocabListItem,
+  updateVocabListItemStatus,
   deleteVocabListItem,
 };

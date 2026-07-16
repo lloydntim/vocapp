@@ -9,10 +9,16 @@ async function findVocabListItemsByListId(listId: string): Promise<VocabularyLis
   return prisma.vocabularyListItem.findMany({ where: { listId } });
 }
 
-async function findVocabListItemByListId(itemId: string, listId: string): Promise<VocabularyListItem> {
-  return handlePrismaError(prisma.vocabularyListItem.findUniqueOrThrow({ where: { id: itemId, listId } }), {
-    P2025: 'Vocabulary List Item does not exist in this list',
-  });
+async function findVocabListItemByListId(
+  itemId: string,
+  listId: string,
+): Promise<VocabularyListItem> {
+  return handlePrismaError(
+    prisma.vocabularyListItem.findUniqueOrThrow({ where: { id: itemId, listId } }),
+    {
+      P2025: 'Vocabulary List Item does not exist in this list',
+    },
+  );
 }
 
 async function findVocabListItemById(itemId: string): Promise<VocabularyListItem> {
@@ -27,13 +33,16 @@ async function addVocabListItem(input: CreateVocabListItemInput): Promise<Vocabu
   });
 }
 
-async function updateVocabListItem(
+async function updateVocabListItemStatus(
   itemId: string,
-  data: UpdateVocabListItemInput,
+  status: 'LEARNING' | 'MASTERED',
 ): Promise<VocabularyListItem> {
-  return handlePrismaError(prisma.vocabularyListItem.update({ where: { id: itemId }, data }), {
-    P2025: 'Vocabulary List Item could not be updated',
-  });
+  return handlePrismaError(
+    prisma.vocabularyListItem.update({ where: { id: itemId }, data: { status } }),
+    {
+      P2025: 'Vocabulary List Item could not be updated',
+    },
+  );
 }
 
 async function deleteVocabListItem(itemId: string): Promise<void> {
@@ -47,6 +56,6 @@ export default {
   findVocabListItemById,
   findVocabListItemByListId,
   addVocabListItem,
-  updateVocabListItem,
+  updateVocabListItemStatus,
   deleteVocabListItem,
 };

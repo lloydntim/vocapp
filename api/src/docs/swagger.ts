@@ -82,6 +82,11 @@ const swaggerSpec = swaggerJsdoc({
             position: { type: 'integer', example: 1 },
             sourceText: { type: 'string', example: 'apple' },
             targetText: { type: 'string', example: 'la pomme' },
+            status: {
+              type: 'string',
+              enum: ['LEARNING', 'MASTERED'],
+              example: 'LEARNING',
+            },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           },

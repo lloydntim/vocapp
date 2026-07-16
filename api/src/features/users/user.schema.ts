@@ -24,10 +24,14 @@ export const userListParamsSchema = z.object({
   params: userListParams,
 });
 
-export const userListItemParamsSchema = paramsSchema({
+export const userListItemParams = z.object({
   userId: uuidParam(),
   listId: uuidParam(),
   itemId: uuidParam(),
+});
+
+export const userListItemParamsSchema = z.object({
+  params: userListItemParams,
 });
 
 export const userListSessionParamsSchema = paramsSchema({
