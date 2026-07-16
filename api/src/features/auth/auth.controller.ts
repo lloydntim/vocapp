@@ -35,6 +35,7 @@ type AuthRequest<P = NoParams, ResBody = AuthResponse, ReqBody = unknown> = Omit
 
 interface AuthResponse {
   accessToken?: string;
+  refreshToken?: string;
   data?: UserResponseData;
   message?: string;
 }
@@ -91,6 +92,7 @@ async function login(
     message: 'User is logged in',
     data: userData,
     accessToken,
+    refreshToken,
   });
 }
 
