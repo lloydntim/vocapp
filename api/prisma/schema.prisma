@@ -26,6 +26,11 @@ enum UserPlan {
   FREE
 }
 
+enum VocabularyItemStatus {
+  LEARNING
+  MASTERED
+}
+
 model User {
   id String  @id @default(uuid()) @db.Uuid
   firstName  String   @map("first_name")
@@ -144,6 +149,8 @@ model VocabularyListItem {
 
   sourceText String   @map("source_text")
   targetText String   @map("target_text")
+
+  status VocabularyItemStatus @default(LEARNING)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
