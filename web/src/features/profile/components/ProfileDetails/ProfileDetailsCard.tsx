@@ -22,11 +22,7 @@ function ProfileDetailsCard({
   className,
 }: ProfileDetailsCardProps) {
   return (
-    <Card
-      className={cn('py-6 px-5.5 rounded-lg', className)}
-      hasBorder
-      hasShadow
-    >
+    <Card className={cn('py-6 px-5.5 rounded-lg', className)} hasBorder>
       <Headline level="h3" className="m-0 mb-2.5 text-[15px] font-bold">
         {title}
       </Headline>
