@@ -12,6 +12,8 @@ type ButtonVariant =
   | 'ghost'
   | 'standard'
   | 'ghost-danger'
+  | 'ghost-warn'
+  | 'ghost-success'
   | 'outline'
   | 'danger'
   | 'outline-danger';
