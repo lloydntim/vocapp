@@ -7,7 +7,6 @@ const usernameSchema = z
   .max(30, 'Username must be at most 30 characters.');
 
 const emailSchema = z
-  .string()
   .email('Enter a valid email address.')
   .min(1, 'Email is required.');
 
@@ -68,3 +67,34 @@ export type {
   ForgotPasswordFormValues,
   ResetPasswordFormValues,
 };
+
+export const userSchema = z.object({
+  id: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.email(),
+  username: z.string(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime(),
+  role: z.enum(['ADMIN', 'USER']),
+  plan: z.enum(['PAID', 'FREE']),
+});
+
+export const loginResponseSchema = z.object({
+  message: z.string(),
+  user: userSchema,
+});
+export const signupResponseSchema = z.object({
+  message: z.string(),
+  data: userSchema,
+});
+
+export const logoutResponseSchema = z.object({
+  success: z.boolean(),
+});
+
+export type User = z.infer<typeof userSchema>;
+
+export type LoginResponse = z.infer<typeof loginResponseSchema>;
+export type SignupResponse = z.infer<typeof signupResponseSchema>;
+export type LogoutResponse = z.infer<typeof logoutResponseSchema>;
