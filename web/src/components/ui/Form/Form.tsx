@@ -39,9 +39,7 @@ function Input({
   ...rest
 }: InputProps) {
   if (type === 'checkbox') {
-    return (
-      <Checkbox ref={ref} id={id} label={label} error={error} {...rest} />
-    );
+    return <Checkbox ref={ref} id={id} label={label} error={error} {...rest} />;
   }
   return (
     <InputField
@@ -75,6 +73,7 @@ interface FormProps<T extends FieldValues> {
   schema: ZodType<T, T>;
   submitButtonText: string;
   submitButtonHandler: SubmitHandler<T>;
+  isSubmitting?: boolean;
 }
 
 function Form<T extends FieldValues>({
@@ -82,6 +81,7 @@ function Form<T extends FieldValues>({
   schema,
   submitButtonText,
   submitButtonHandler,
+  isSubmitting,
 }: FormProps<T>) {
   const {
     register,
@@ -105,7 +105,9 @@ function Form<T extends FieldValues>({
         />
       ))}
 
-      <Button type="submit">{submitButtonText}</Button>
+      <Button disabled={isSubmitting} type="submit">
+        {submitButtonText}
+      </Button>
     </form>
   );
 }

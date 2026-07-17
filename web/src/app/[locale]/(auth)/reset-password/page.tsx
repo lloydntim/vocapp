@@ -1,6 +1,6 @@
 'use client';
 
-import Form, { InputDataItem } from '@/components/ui/Form/Form';
+import Form from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
 import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
@@ -11,7 +11,7 @@ import {
 
 const authHeaderLinkText = <Link href="/login">Back to log in</Link>;
 
-const formFields: InputDataItem<ResetPasswordFormValues>[] = [
+const formFields = [
   {
     schemaKey: 'password',
     id: 'password',
@@ -32,11 +32,11 @@ const formFields: InputDataItem<ResetPasswordFormValues>[] = [
   },
 ];
 
-const onSubmit = (data: ResetPasswordFormValues) => {
+const onSubmit = (data: unknown | ResetPasswordFormValues) => {
   console.log('data', data);
 };
 
-function page() {
+function ResetPasswordPage() {
   return (
     <AuthFormColumn authHeaderLink={authHeaderLinkText}>
       <AuthCard
@@ -57,4 +57,4 @@ function page() {
   );
 }
 
-export default page;
+export default ResetPasswordPage;

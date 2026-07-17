@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from '@/i18n/navigation';
-import { useLogin } from '@/features/auth/hooks/useAuthMutations';
+import { useLogin } from '@/features/auth/hooks';
 
 import Form, { InputDataItem } from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
@@ -70,6 +70,7 @@ function LoginPage() {
               fields={formFields}
               submitButtonText="Login"
               submitButtonHandler={onSubmit}
+              isSubmitting={loginMutation.isPending}
             />
           </>
         }

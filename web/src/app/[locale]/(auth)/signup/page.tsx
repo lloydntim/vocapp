@@ -1,11 +1,13 @@
 'use client';
-
+import { useRouter } from '@/i18n/navigation';
+import { useSignup } from '@/features/auth/hooks';
 import Form, { InputDataItem } from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
 import Text from '@/components/ui/Text/Text';
 import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
 import { SignupFormValues, signupSchema } from '@/features/auth/schemas';
+import { ApiError } from '@/lib/client-api';
 
 const formFields: InputDataItem<SignupFormValues>[] = [
   {
@@ -67,11 +69,24 @@ const authHeaderLinkText = (
   </Text>
 );
 
-const onSubmit = (data: SignupFormValues) => {
-  console.log('data', data);
-};
+function SignupPage() {
+  const router = useRouter();
+  const signupMutation = useSignup();
 
-function page() {
+  const onSubmit = (data: SignupFormValues) => {
+    signupMutation.mutate(data, {
+      onSuccess: () => {
+        router.push('/auth/verify');
+        router.refresh();
+      },
+    });
+  };
+
+  const errorMessage =
+    signupMutation.error instanceof ApiError
+      ? signupMutation.error.message
+      : null;
+
   return (
     <AuthFormColumn authHeaderLink={authHeaderLinkText}>
       <AuthCard
@@ -80,12 +95,16 @@ function page() {
           subtitle: 'Free to use. Start building vocabulary lists in minutes.',
         }}
         content={
-          <Form
-            schema={signupSchema}
-            fields={formFields}
-            submitButtonText="Create account"
-            submitButtonHandler={onSubmit}
-          />
+          <>
+            {errorMessage && <Text role="alert">{errorMessage}</Text>}
+            <Form
+              schema={signupSchema}
+              fields={formFields}
+              submitButtonText="Create account"
+              submitButtonHandler={onSubmit}
+              isSubmitting={signupMutation.isPending}
+            />
+          </>
         }
         hasDivider
         dividerText="or"
@@ -99,4 +118,4 @@ function page() {
   );
 }
 
-export default page;
+export default SignupPage;

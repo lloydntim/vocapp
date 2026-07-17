@@ -6,6 +6,7 @@ type TextSize = 'small' | 'base' | 'large';
 interface TextProps extends PropsWithChildren {
   className?: string;
   size?: TextSize;
+  role?: string;
 }
 
 const textSizeClassMap: Record<TextSize, string> = {
@@ -15,9 +16,13 @@ const textSizeClassMap: Record<TextSize, string> = {
 };
 const textClass = 'text-[var(--text)]';
 
-function Text({ children, className, size = 'base' }: TextProps) {
+function Text({ children, className, size = 'base', role }: TextProps) {
   const textSizeClass = textSizeClassMap[size];
-  return <p className={cn(textClass, textSizeClass, className)}>{children}</p>;
+  return (
+    <p className={cn(textClass, textSizeClass, className)} role={role}>
+      {children}
+    </p>
+  );
 }
 
 export default Text;
