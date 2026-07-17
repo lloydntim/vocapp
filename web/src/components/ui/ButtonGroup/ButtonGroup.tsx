@@ -11,6 +11,8 @@ type ButtonItemProps<T extends ButtonGroupType> = Omit<
   label?: string;
 };
 
+type ButtonGroupDirection = 'row' | 'col';
+
 interface ButtonGroupProps<T extends ButtonGroupType> {
   className?: string;
   style?: CSSProperties;
@@ -18,6 +20,7 @@ interface ButtonGroupProps<T extends ButtonGroupType> {
   size?: 'small' | 'base' | 'large';
   variant?: ButtonVariant;
   type?: T;
+  direction?: ButtonGroupDirection;
 }
 
 const typeMap = {
@@ -32,19 +35,29 @@ function ButtonGroup<T extends ButtonGroupType>({
   style,
   size = 'base',
   variant: buttonGroupVariant = 'standard',
+  direction = 'row',
 }: ButtonGroupProps<T>) {
   const ButtonComponent = typeMap[type ?? 'button'] as ComponentType<
     (typeof buttons)[number]
   >;
+  // flex-1 (flex-basis: 0%) sizes buttons along the main axis, so it only
+  // gives equal widths when that axis is horizontal. In a column stack the
+  // main axis is vertical, and flex-basis: 0% would collapse each button's
+  // explicit height instead — use w-full there so height stays intact.
+  const itemSizeClass = direction === 'col' ? 'w-full' : 'flex-1';
+
   return (
-    <div className={cn('flex gap-2', className)} style={style}>
+    <div
+      className={cn('flex gap-2', direction === 'col' && 'flex-col', className)}
+      style={style}
+    >
       {buttons.map((props, index) => {
         return (
           <ButtonComponent
             key={index}
             {...{
               ...props,
-              className: cn('flex-1', props.className),
+              className: cn(itemSizeClass, props.className),
               children: props.label,
               size,
               variant: props.variant ?? buttonGroupVariant,

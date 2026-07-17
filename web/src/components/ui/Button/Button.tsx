@@ -32,6 +32,8 @@ export interface ButtonProps {
   isLink?: boolean;
   to?: string;
   icon?: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
+  rel?: 'noopener' | 'noreferrer' | 'nofollow' | 'external';
   onClick?: MouseEventHandler;
   onMouseUp?: MouseEventHandler;
   onMouseDown?: MouseEventHandler;
@@ -58,10 +60,12 @@ export default function Button({
   onTouchEnd,
   type = 'button',
   isLink = false,
+  target = '_blank',
+  rel = 'noopener',
   ...rest
 }: ButtonProps) {
   const baseClass = cn(
-    'font-[var(--font-sans)]',
+    'font-(--font-sans)',
     'gap-2',
     'px-4',
     'justify-center',
@@ -124,7 +128,14 @@ export default function Button({
 
   if (isLink) {
     return (
-      <Link href={to} className={buttonClassName}>
+      <Link
+        href={to}
+        className={buttonClassName}
+        target={target}
+        title={title}
+        aria-label={ariaLabel}
+        rel={rel}
+      >
         {icon && <Icon type={icon} size={sizeMap[size].icon} />}
         {children}
       </Link>
