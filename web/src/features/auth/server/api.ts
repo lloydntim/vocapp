@@ -1,6 +1,6 @@
 import 'server-only';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.API_URL;
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
   const url = `${API_URL}${path}`;
