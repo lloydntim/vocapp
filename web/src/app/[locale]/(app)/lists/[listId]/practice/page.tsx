@@ -40,7 +40,7 @@ function page({ params }: PageProps) {
             { label: '🇫🇷 French', value: 'fr' },
             { label: '🇬🇧 English', value: 'en' },
           ]}
-          valueChangeHandler={(value) => console.log(value)}
+          onValueChange={(value) => console.log(value)}
           size="small"
         />
         <div

@@ -1,3 +1,5 @@
+import { DataTableColumnItem } from '../app/components/DataTablePanel/DataTable/types';
+
 export const itemColumnConfigData = [
   {
     name: 'French',
@@ -20,4 +22,4 @@ export const itemColumnConfigData = [
     id: 'status',
     type: 'chip',
   },
-];
+] satisfies DataTableColumnItem[];
