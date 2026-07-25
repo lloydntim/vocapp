@@ -6,7 +6,7 @@ import { apiRequest } from '@/features/auth/server/api';
 export async function GET() {
   const accessToken = (await cookies()).get('accessToken')?.value;
   if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated', status: 401 });
+    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
   }
 
   const apiResponse = await apiRequest('/users/me', {

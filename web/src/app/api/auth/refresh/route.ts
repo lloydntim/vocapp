@@ -1,13 +1,17 @@
-// web/src/app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { apiRequest } from '@/features/auth/server/api';
 
 export async function POST(request: Request) {
-  const credentials = await request.json();
+  const refreshToken = (await cookies()).get('refreshToken')?.value;
 
-  const apiResponse = await apiRequest('/auth/login', {
+  if (!refreshToken) {
+    return NextResponse.json({ message: 'No refresh token' }, { status: 401 });
+  }
+
+  const apiResponse = await apiRequest('/auth/refresh', {
     method: 'POST',
-    body: JSON.stringify(credentials),
+    headers: { Cookie: `refreshToken=${refreshToken}` },
   });
 
   const result = await apiResponse.json();
@@ -16,10 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json(result, { status: apiResponse.status });
   }
 
-  const response = NextResponse.json({
-    message: result.message,
-    user: result.data,
-  });
+  const response = NextResponse.json({ message: result.message });
 
   response.cookies.set('accessToken', result.accessToken, {
     httpOnly: true,
