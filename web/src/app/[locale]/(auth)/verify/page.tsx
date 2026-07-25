@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Link from '@/components/ui/Link/Link';
 import Text from '@/components/ui/Text/Text';
@@ -9,6 +10,7 @@ import Icon from '@/components/ui/Icon/Icon';
 import ButtonGroup from '@/components/ui/ButtonGroup/ButtonGroup';
 import Card from '@/components/ui/Card/Card';
 import Button from '@/components/ui/Button/Button';
+import { getOpenEmailAppUrl } from '@/features/auth/lib/webmail';
 import { ReactNode } from 'react';
 
 const authHeaderLinkText = (
@@ -78,6 +80,9 @@ function StepsCard({ title, steps }: StepsCardProps) {
 }
 
 function VerifyPage() {
+  const email = useSearchParams().get('email');
+  const openEmailAppUrl = getOpenEmailAppUrl(email);
+
   return (
     <AuthFormColumn authHeaderLink={authHeaderLinkText}>
       <AuthCard
@@ -98,7 +103,7 @@ function VerifyPage() {
               buttons={[
                 {
                   label: 'Open email app',
-                  to: 'mailto:',
+                  to: openEmailAppUrl,
                   target: '_blank',
                   rel: 'noopener',
                   isLink: true,

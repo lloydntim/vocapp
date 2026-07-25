@@ -1,6 +1,6 @@
 'use client';
 
-import Form from '@/components/ui/Form/Form';
+import Form, { InputDataItem } from '@/components/ui/Form/Form';
 import Link from '@/components/ui/Link/Link';
 import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
@@ -11,7 +11,7 @@ import {
 
 const authHeaderLinkText = <Link href="/login">Back to log in</Link>;
 
-const formFields = [
+const formFields: InputDataItem<ResetPasswordFormValues>[] = [
   {
     schemaKey: 'password',
     id: 'password',

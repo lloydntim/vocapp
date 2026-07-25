@@ -7,7 +7,7 @@ interface LocaleLayoutProps extends PropsWithChildren {
   params: Promise<{ locale: string }>;
 }
 
-async function layout({ children, params }: Readonly<LocaleLayoutProps>) {
+async function Layout({ children, params }: Readonly<LocaleLayoutProps>) {
   const { locale } = await params;
 
   if (!hasLocale(routing.locales, locale)) {
@@ -16,4 +16,4 @@ async function layout({ children, params }: Readonly<LocaleLayoutProps>) {
   return <NextIntlClientProvider>{children}</NextIntlClientProvider>;
 }
 
-export default layout;
+export default Layout;

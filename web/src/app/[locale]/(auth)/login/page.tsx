@@ -10,6 +10,8 @@ import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
 import { loginSchema, LoginFormValues } from '@/features/auth/schemas';
 import { ApiError } from '@/lib/client-api';
+import FormBanner from '@/components/ui/Form/FormBanner';
+import { useState } from 'react';
 
 const authHeaderLinkText = (
   <Text>
@@ -38,12 +40,14 @@ const formFields: InputDataItem<LoginFormValues>[] = [
 ];
 
 function LoginPage() {
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   const loginMutation = useLogin();
 
   const onSubmit = (data: LoginFormValues) => {
     loginMutation.mutate(data, {
       onSuccess: () => {
+        setIsRedirecting(true);
         router.push('/dashboard');
         router.refresh();
       },
@@ -64,13 +68,19 @@ function LoginPage() {
         }}
         content={
           <>
-            {errorMessage && <Text role="alert">{errorMessage}</Text>}
+            {errorMessage && (
+              <FormBanner
+                message={errorMessage}
+                status="error"
+                className="mb-4"
+              />
+            )}
             <Form
               schema={loginSchema}
               fields={formFields}
               submitButtonText="Login"
               submitButtonHandler={onSubmit}
-              isSubmitting={loginMutation.isPending}
+              isSubmitting={loginMutation.isPending || isRedirecting}
             />
           </>
         }

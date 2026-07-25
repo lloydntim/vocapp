@@ -1,4 +1,6 @@
 'use client';
+
+import { useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useSignup } from '@/features/auth/hooks';
 import Form, { InputDataItem } from '@/components/ui/Form/Form';
@@ -8,6 +10,7 @@ import AuthCard from '@/features/auth/components/AuthCard/AuthCard';
 import AuthFormColumn from '@/features/auth/components/AuthFormColumn/AuthFormColumn';
 import { SignupFormValues, signupSchema } from '@/features/auth/schemas';
 import { ApiError } from '@/lib/client-api';
+import FormBanner from '@/components/ui/Form/FormBanner';
 
 const formFields: InputDataItem<SignupFormValues>[] = [
   {
@@ -70,16 +73,23 @@ const authHeaderLinkText = (
 );
 
 function SignupPage() {
+  const locale = useLocale();
   const router = useRouter();
   const signupMutation = useSignup();
 
   const onSubmit = (data: SignupFormValues) => {
-    signupMutation.mutate(data, {
-      onSuccess: () => {
-        router.push('/auth/verify');
-        router.refresh();
+    signupMutation.mutate(
+      { ...data, locale },
+      {
+        onSuccess: () => {
+          router.push({ pathname: '/verify', query: { email: data.email } });
+          router.refresh();
+        },
+        onError: (error) => {
+          console.error('Signup error:', error);
+        },
       },
-    });
+    );
   };
 
   const errorMessage =
@@ -96,7 +106,13 @@ function SignupPage() {
         }}
         content={
           <>
-            {errorMessage && <Text role="alert">{errorMessage}</Text>}
+            {errorMessage && (
+              <FormBanner
+                message={'Something went wrong. Please try again.'}
+                status="error"
+                className="mb-4"
+              />
+            )}
             <Form
               schema={signupSchema}
               fields={formFields}
