@@ -30,9 +30,13 @@ const mockList = {
   targetLanguageId: null,
   sourceLanguageCode: 'en',
   targetLanguageCode: 'de',
+  lastPracticed: null,
   deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+  total: 0,
+  mastered: 0,
+  progress: 0,
 };
 
 const mockItem = {

@@ -255,7 +255,7 @@ router.delete(
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/VocabularyList'
+ *                     $ref: '#/components/schemas/VocabularyListWithStats'
  *       401:
  *         description: Missing or invalid access token
  *       403:
@@ -375,7 +375,7 @@ router.post(
  *                   type: string
  *                   example: Vocabulary list successfully retrieved
  *                 data:
- *                   $ref: '#/components/schemas/VocabularyList'
+ *                   $ref: '#/components/schemas/VocabularyListWithStats'
  *       401:
  *         description: Missing or invalid access token
  *       403:

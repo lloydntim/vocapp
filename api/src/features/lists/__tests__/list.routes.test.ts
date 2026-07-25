@@ -36,6 +36,7 @@ const mockList = {
   targetLanguageId: null,
   sourceLanguageCode: 'en',
   targetLanguageCode: 'de',
+  lastPracticed: null,
   deletedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),

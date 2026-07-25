@@ -69,10 +69,24 @@ const swaggerSpec = swaggerJsdoc({
             sourceLanguageCode: { type: 'string', example: 'en' },
             targetLanguageCode: { type: 'string', example: 'fr' },
             name: { type: 'string', example: 'French Vocabulary Notes' },
+            lastPracticed: { type: 'string', format: 'date-time', nullable: true },
             deletedAt: { type: 'string', format: 'date-time', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' },
           },
+        },
+        VocabularyListWithStats: {
+          allOf: [
+            { $ref: '#/components/schemas/VocabularyList' },
+            {
+              type: 'object',
+              properties: {
+                total: { type: 'integer', example: 12 },
+                mastered: { type: 'integer', example: 5 },
+                progress: { type: 'number', example: 42, description: 'Percentage (0-100) of items mastered' },
+              },
+            },
+          ],
         },
         VocabularyListItem: {
           type: 'object',
