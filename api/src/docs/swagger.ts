@@ -88,6 +88,14 @@ const swaggerSpec = swaggerJsdoc({
             },
           ],
         },
+        Translation: {
+          type: 'object',
+          properties: {
+            translatedText: { type: 'string', example: 'Elle a une voiture' },
+            detectedLanguageCode: { type: 'string', example: 'en', nullable: true },
+            model: { type: 'string', nullable: true },
+          },
+        },
         VocabularyListItem: {
           type: 'object',
           properties: {
