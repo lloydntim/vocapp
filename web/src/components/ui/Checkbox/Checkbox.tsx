@@ -27,42 +27,37 @@ interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
   onChange?: ChangeEventHandler<HTMLInputElement>;
 }
 
-const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  function Checkbox({ id, checked, label, error, onChange, ...rest }, ref) {
-    const [isChecked, setIsChecked] = useState(checked ?? false);
-    const errorId = `${id}-error`;
-    const hasError = Boolean(error);
-    return (
-      <>
-        <label className={checkboxRowClass}>
-          <input
-            ref={ref}
-            className="hidden"
-            id={id}
-            type="checkbox"
-            checked={isChecked}
-            onChange={(e) => {
-              setIsChecked(e.target.checked);
-              onChange?.(e);
-            }}
-            {...rest}
-          />
-          <span
-            className={cn(checkboxClass, isChecked && checkboxActiveClass)}
-          >
-            {isChecked && <Icon size={CHECK_ICON_SIZE} type="check" />}
-          </span>
-          {label && <span>{label}</span>}
-        </label>
-        {hasError && (
-          <div className={inputErrorClass} id={errorId} role="alert">
-            <Icon size={ERROR_ICON_SIZE} type="circle-alert" />
-            <span>{error}</span>
-          </div>
-        )}
-      </>
-    );
-  },
-);
+const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
+  { id, checked = false, label, error, onChange, ...rest },
+  ref,
+) {
+  const errorId = `${id}-error`;
+  const hasError = Boolean(error);
+  return (
+    <>
+      <label className={checkboxRowClass}>
+        <input
+          ref={ref}
+          className="hidden"
+          id={id}
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          {...rest}
+        />
+        <span className={cn(checkboxClass, checked && checkboxActiveClass)}>
+          {checked && <Icon size={CHECK_ICON_SIZE} type="check" />}
+        </span>
+        {label && <span>{label}</span>}
+      </label>
+      {hasError && (
+        <div className={inputErrorClass} id={errorId} role="alert">
+          <Icon size={ERROR_ICON_SIZE} type="circle-alert" />
+          <span>{error}</span>
+        </div>
+      )}
+    </>
+  );
+});
 
 export default Checkbox;

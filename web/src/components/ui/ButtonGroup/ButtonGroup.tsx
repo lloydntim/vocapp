@@ -21,6 +21,9 @@ interface ButtonGroupProps<T extends ButtonGroupType> {
   variant?: ButtonVariant;
   type?: T;
   direction?: ButtonGroupDirection;
+  /** Set false so buttons size to their own content instead of
+   * stretching to match each other. */
+  stretch?: boolean;
 }
 
 const typeMap = {
@@ -36,15 +39,14 @@ function ButtonGroup<T extends ButtonGroupType>({
   size = 'base',
   variant: buttonGroupVariant = 'standard',
   direction = 'row',
+  stretch = true,
 }: ButtonGroupProps<T>) {
   const ButtonComponent = typeMap[type ?? 'button'] as ComponentType<
     (typeof buttons)[number]
   >;
-  // flex-1 (flex-basis: 0%) sizes buttons along the main axis, so it only
-  // gives equal widths when that axis is horizontal. In a column stack the
-  // main axis is vertical, and flex-basis: 0% would collapse each button's
-  // explicit height instead — use w-full there so height stays intact.
-  const itemSizeClass = direction === 'col' ? 'w-full' : 'flex-1';
+  // flex-1's flex-basis: 0% sizes buttons along the main axis, which is
+  // vertical in a column — use w-full there instead so height isn't collapsed.
+  const itemSizeClass = stretch && (direction === 'col' ? 'w-full' : 'flex-1');
 
   return (
     <div

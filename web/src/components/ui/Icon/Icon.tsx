@@ -44,6 +44,11 @@ import {
   Volume,
   X,
   PenLine,
+  Info,
+  TriangleAlert,
+  CircleCheck,
+  List,
+  Languages,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
@@ -69,6 +74,7 @@ const iconMap = {
   eye: Eye,
   'eye-off': EyeOff,
   'circle-alert': CircleAlert,
+  'circle-check': CircleCheck,
   'at-sign': AtSign,
   signature: Signature,
   'user-round': UserRound,
@@ -96,6 +102,10 @@ const iconMap = {
   volume: Volume,
   close: X,
   'pen-line': PenLine,
+  info: Info,
+  'triangle-alert': TriangleAlert,
+  list: List,
+  language: Languages,
 } as Record<string, LucideIcon>;
 
 function Icon({ type = '', ...rest }: IconProps) {

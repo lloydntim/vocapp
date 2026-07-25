@@ -9,7 +9,8 @@ const progressBarClass =
 const progressBarFillClass =
   'block h-full bg-(--brand) rounded-full transition-[width] duration-[600ms] ease-(--ease)';
 
-const progressBarPercentClass = 'text-(--text-dim)';
+const progressBarPercentClass =
+  'text-(--text-dim) min-w-10 inline-block text-right';
 
 type ProgressBarSize = 'small' | 'large';
 

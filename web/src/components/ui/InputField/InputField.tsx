@@ -5,7 +5,7 @@ import { ChangeEvent, InputHTMLAttributes, forwardRef, useState } from 'react';
 import Icon from '../Icon/Icon';
 import IconButton from '../IconButton/IconButton';
 
-interface InputFieldProps extends Omit<
+export interface InputFieldProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'size'
 > {
@@ -29,13 +29,14 @@ const inputIconWrapperClass =
   'absolute left-[13px] top-1/2 -translate-y-1/2 text-(--text-dim) pointer-events-none h';
 
 const inputClass =
-  'h-12 bg-[var(--surface-2)] border border-[var(--border)] rounded-[10px] px-10 w-full text-sm text-[var(--text)] transition-[border-color,background] duration-[var(--dur-fast)] ease-[var(--ease)]';
+  'h-12 bg-[var(--surface-2)] border border-[var(--border)] rounded-[10px] px-10 w-full text-sm text-[var(--text)] transition-[border-color,background] duration-[var(--dur-fast)] ease-[var(--ease)] disabled:opacity-50 disabled:cursor-not-allowed';
 const inputFocus =
   'focus:outline-none focus:border-[var(--brand)] focus:bg-[var(--surface)] focus:shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand)_20%,transparent)]';
 
-const inputFieldClass = 'flex flex-col gap-1.5 flex-1';
+const inputFieldClass = 'group flex flex-col gap-1.5 flex-1';
 const inputWrapClass = 'relative flex';
-const inputLabelClass = 'text-sm font-medium text-[var(--text-muted)]';
+const inputLabelClass =
+  'text-sm font-medium text-[var(--text-muted)] group-has-[:disabled]:opacity-50';
 const inputHintClass = 'text-sm text-[var(--text-dim)]';
 const inputErrorClass =
   'flex items-center gap-1.5 text-sm text-[var(--danger)] leading-1.4 animate-field-error-in ease-[var(--ease)] duration-[160ms]';

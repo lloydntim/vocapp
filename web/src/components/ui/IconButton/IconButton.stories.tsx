@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 
-import IconButton, { IconButtonType } from './IconButton';
+import IconButton from './IconButton';
 
 const meta = {
   component: IconButton,
@@ -32,14 +32,14 @@ export const Basic = {
 
 export const Primary = {
   args: {
-    icon: 'moon' as IconButtonType,
+    icon: 'moon',
     rank: 'primary',
   },
 } satisfies Story;
 
 export const Secondary = {
   args: {
-    icon: 'moon' as IconButtonType,
+    icon: 'moon',
     rank: 'secondary',
   },
 } satisfies Story;

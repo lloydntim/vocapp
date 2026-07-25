@@ -49,7 +49,13 @@ function Link({
   }
 
   return (
-    <NextIntlLink className={linkClass} href={href} title={title} style={style}>
+    <NextIntlLink
+      className={linkClass}
+      href={href}
+      title={title}
+      style={style}
+      prefetch={false}
+    >
       {children}
     </NextIntlLink>
   );

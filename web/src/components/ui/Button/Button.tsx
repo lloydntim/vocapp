@@ -4,6 +4,7 @@ import { MouseEventHandler, ReactNode, TouchEventHandler } from 'react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Icon from '../Icon/Icon';
+import Spinner from '../Spinner/Spinner';
 
 type ButtonType = 'submit' | 'button' | 'reset';
 type ButtonSize = 'small' | 'base' | 'large';
@@ -16,7 +17,9 @@ type ButtonVariant =
   | 'ghost-success'
   | 'outline'
   | 'danger'
-  | 'outline-danger';
+  | 'outline-danger'
+  | 'warn'
+  | 'outline-warn';
 
 export type { ButtonSize, ButtonRank, ButtonVariant, ButtonType };
 
@@ -34,6 +37,7 @@ export interface ButtonProps {
   isLink?: boolean;
   to?: string;
   icon?: string;
+  loading?: boolean;
   target?: '_blank' | '_self' | '_parent' | '_top';
   rel?: 'noopener' | 'noreferrer' | 'nofollow' | 'external';
   onClick?: MouseEventHandler;
@@ -64,6 +68,7 @@ export default function Button({
   isLink = false,
   target = '_blank',
   rel = 'noopener',
+  loading = false,
   ...rest
 }: ButtonProps) {
   const baseClass = cn(
@@ -100,7 +105,7 @@ export default function Button({
     ),
   };
 
-  const dangerVariantMap: Record<string, string> = {
+  const variantMap: Record<string, string> = {
     danger: cn(
       'text-white',
       'bg-(--danger)',
@@ -113,6 +118,18 @@ export default function Button({
       'border-(--danger)',
       'hover:bg-(--danger-soft)',
     ),
+    warn: cn(
+      'text-white',
+      'bg-(--warn)',
+      'border-(--warn)',
+      'hover:brightness-90',
+    ),
+    'outline-warn': cn(
+      'text-(--warn)',
+      'bg-transparent',
+      'border-(--warn)',
+      'hover:bg-(--warn-soft)',
+    ),
   };
 
   const sizeMap: Record<string, { button: string; icon: number }> = {
@@ -123,7 +140,7 @@ export default function Button({
 
   const buttonClassName = cn(
     baseClass,
-    dangerVariantMap[variant] ?? rankMap[rank],
+    variantMap[variant] ?? rankMap[rank],
     sizeMap[size].button,
     className,
   );
@@ -157,7 +174,11 @@ export default function Button({
       onTouchEnd={onTouchEnd}
       {...rest}
     >
-      {icon && <Icon type={icon} size={sizeMap[size].icon} />}
+      {loading ? (
+        <Spinner size={size} />
+      ) : (
+        icon && <Icon type={icon} size={sizeMap[size].icon} />
+      )}
       {children}
     </button>
   );

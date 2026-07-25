@@ -8,7 +8,8 @@ import LandingSection, {
   SectionData,
   SectionHeadAlign,
 } from '../LandingSection/LandingSection';
-import Button, { ButtonProps } from '@/components/ui/Button/Button';
+import { ButtonProps } from '@/components/ui/Button/Button';
+import ButtonGroup from '@/components/ui/ButtonGroup/ButtonGroup';
 
 export const ctaSectionData = {
   id: 'cta',
@@ -23,7 +24,7 @@ export const ctaSectionData = {
       size: 'large',
       isLink: true,
       to: 'VocApp Redesign.html',
-      children: 'Open VocApp',
+      label: 'Open VocApp',
       className:
         'bg-white text-[var(--teal-600)] hover:bg-white/90 border-white hover:border-white/90 shadow-[0_1px_2px_rgba(11,93,93,0.25)]',
     },
@@ -33,11 +34,11 @@ export const ctaSectionData = {
       size: 'large',
       isLink: true,
       to: '#features',
-      children: 'Explore features',
+      label: 'Explore features',
       className: 'border-white hover:bg-white/12',
     },
   ],
-} as SectionData<ButtonProps>;
+} as SectionData<ButtonProps & { label: string }>;
 
 interface CtaSectionProps extends LandingSectionProps {
   items: ButtonProps[];
@@ -58,29 +59,14 @@ function CtaSection({ id, title, subtitle }: CtaSectionProps) {
       >
         <Headline level="h2">{title}</Headline>
         <Text>{subtitle}</Text>
-        <div className={ctaButtonGroupClass}>
-          {ctaSectionData.items.map((item, index) => (
-            <Button key={index} {...item} />
-          ))}
-        </div>
+        <ButtonGroup
+          buttons={ctaSectionData.items}
+          className={ctaButtonGroupClass}
+          stretch={false}
+        />
       </Card>
     </LandingSection>
   );
 }
-
-// export default CtaSection;
-//     <section className="lp-cta">
-//       <Container>
-//         <Card
-//           className={cn(ctaCardClass, 'lp-cta-card reveal in')}
-//           style={{ animationDelay: '0ms' }}
-//         >
-//           <Headline level="h2">Start building your vocabulary today</Headline>
-//           <Text>{ctaSectionData.title}</Text>
-//         </Card>
-//       </Container>
-//     </section>
-//   );
-// }
 
 export default CtaSection;

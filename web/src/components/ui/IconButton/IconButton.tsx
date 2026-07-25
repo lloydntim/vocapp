@@ -1,10 +1,11 @@
 'use client';
 
-import { MouseEvent, MouseEventHandler, TouchEventHandler } from 'react';
+import { MouseEventHandler, TouchEventHandler } from 'react';
 import type { ButtonRank, ButtonVariant, ButtonType } from '../Button/Button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Icon from '../Icon/Icon';
+import Spinner from '../Spinner/Spinner';
 
 const rankMap: Record<string, string> = {
   primary: cn(
@@ -38,6 +39,14 @@ const variantMap: Record<string, string> = {
     ghostVariantClass,
     'hover:bg-(--danger-soft) hover:text-(--danger) hover:border-(--danger)',
   ),
+  'ghost-success': cn(
+    ghostVariantClass,
+    'hover:bg-(--success-soft) hover:text-(--success) hover:border-(--success)',
+  ),
+  'ghost-warn': cn(
+    ghostVariantClass,
+    'hover:bg-(--warn-soft) hover:text-(--warn) hover:border-(--warn)',
+  ),
   outline: cn(
     ghostVariantClass,
     'border-(--border)',
@@ -58,6 +67,7 @@ interface IconButtonProps {
   icon?: string;
   size?: 'small' | 'base' | 'large';
   to?: string;
+  loading?: boolean;
   onClick?: MouseEventHandler;
   onMouseUp?: MouseEventHandler;
   onMouseDown?: MouseEventHandler;
@@ -97,6 +107,7 @@ function IconButton({
   type = 'button',
   isLink = false,
   icon,
+  loading = false,
   ...rest
 }: IconButtonProps) {
   const isDisabledClass = disabled && 'opacity-50 cursor-not-allowed';
@@ -120,22 +131,23 @@ function IconButton({
   }
   return (
     <button
+      type={type}
       disabled={disabled}
       className={iconButtonClass}
       title={title}
       aria-label={ariaLabel}
-      onClick={(event: MouseEvent<HTMLButtonElement>) => {
-        if (type === 'submit') event.preventDefault();
-
-        onClick?.(event);
-      }}
+      onClick={onClick}
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       {...rest}
     >
-      <Icon type={icon} size={iconButtonIconSize} />
+      {loading ? (
+        <Spinner size={size} />
+      ) : (
+        <Icon type={icon} size={iconButtonIconSize} />
+      )}
     </button>
   );
 }

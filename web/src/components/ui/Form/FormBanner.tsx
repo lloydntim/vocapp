@@ -4,9 +4,10 @@ import IconButton from '../IconButton/IconButton';
 import type { ButtonVariant } from '../Button/Button';
 
 type FormBannerStatus = 'error' | 'warn' | 'success';
+
 interface FormBannerProps {
   className?: string;
-  title: string;
+  title?: string;
   message: string;
   role?: string;
   status?: FormBannerStatus;
@@ -15,6 +16,7 @@ interface FormBannerProps {
 }
 
 const ICON_SIZE = 18;
+
 const formBannerStatusClassMap: Record<
   FormBannerStatus,
   { bg: string; border: string; icon: string; variant: ButtonVariant }
