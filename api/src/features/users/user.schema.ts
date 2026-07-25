@@ -51,6 +51,7 @@ export const createUserSchema = z.object({
       .max(30)
       .regex(/^[a-z0-9_-]+$/, 'Only lowercase letters, numbers, hyphens and underscores'),
     password: z.string().min(8).max(128),
+    locale: z.string().optional(),
   }),
 });
 

@@ -7,7 +7,6 @@ import userRepository from './user.repository.js';
 import userService from './user.service.js';
 
 interface UserResponse {
-  accessToken?: string;
   data?: User | User[];
   message?: string;
 }

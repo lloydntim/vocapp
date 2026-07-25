@@ -5,6 +5,7 @@ import { ConflictError } from '../../errors/ConflictError.js';
 import { NotFoundError } from '../../errors/NotFoundError.js';
 import { UnauthorizedError } from '../../errors/UnauthorizedError.js';
 import { TokenPurpose } from '../../generated/prisma/enums.js';
+import redisClient from '../../redis/client.js';
 import type { CreateUserInput as RegisterInput } from '../users/user.schema.js';
 import userRepository from './../users/user.repository.js';
 import { type ForgotPasswordInput, type LoginInput } from './auth.types.js';
@@ -12,12 +13,14 @@ import refreshTokenRepository from './refreshToken.repository.js';
 import tokenRepository from './token.repository.js';
 import tokenService from './token.service.js';
 
+const REFRESH_TOKEN_REUSE_GRACE_SECONDS = 30;
+
 export async function registerUser(input: RegisterInput) {
   const { password, ...userData } = input;
   const { username, email } = userData;
   const hashedPassword = await hash(password);
 
-  const existingUser = await userRepository.findUserByEmailOrUsername(username);
+  const existingUser = await userRepository.findConflictingUser(username, email);
 
   if (existingUser) {
     logger.warn({ username, email }, 'Username or email exists already');
@@ -45,7 +48,7 @@ export async function registerUser(input: RegisterInput) {
 }
 
 export async function loginUser({ username, password }: LoginInput) {
-  const existingUser = await userRepository.findUserByEmailOrUsername(username);
+  const existingUser = await userRepository.findUserByLoginIdentifier(username);
 
   if (!existingUser?.credential?.passwordHash) {
     logger.warn({ username }, 'Invalid login attempt');
@@ -96,8 +99,29 @@ export async function rotateRefreshToken(refreshToken: string) {
   const hashedToken = tokenService.hashRandomToken(refreshToken);
   const existing = await refreshTokenRepository.findRefreshTokenByHash(hashedToken);
 
-  if (!existing || existing.revokedAt || existing.expiresAt < new Date()) {
-    logger.warn({ userId: existing?.userId }, 'Refresh token reuse detected or token invalid');
+  if (!existing) {
+    logger.warn({}, 'Refresh token reuse detected or token invalid');
+    throw new UnauthorizedError('Token reuse detected');
+  }
+
+  if (existing.revokedAt) {
+    // A legitimate concurrent request (e.g. the middleware refreshing a page
+    // navigation at the same moment a client-side fetch also hit a 401 and
+    // refreshed) can present this same, now-revoked token microseconds after
+    // the winning request rotated it. If that just happened, hand back the
+    // same new token pair instead of treating it as theft.
+    const cached = await redisClient.get(`refresh-grace:${hashedToken}`);
+
+    if (cached) {
+      return JSON.parse(cached) as { newAccessToken: string; newRefreshToken: string };
+    }
+
+    logger.warn({ userId: existing.userId }, 'Refresh token reuse detected or token invalid');
+    throw new UnauthorizedError('Token reuse detected');
+  }
+
+  if (existing.expiresAt < new Date()) {
+    logger.warn({ userId: existing.userId }, 'Refresh token reuse detected or token invalid');
     throw new UnauthorizedError('Token reuse detected');
   }
 
@@ -127,14 +151,17 @@ export async function rotateRefreshToken(refreshToken: string) {
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
 
-  return {
-    newAccessToken,
-    newRefreshToken,
-  };
+  const result = { newAccessToken, newRefreshToken };
+
+  await redisClient.set(`refresh-grace:${hashedToken}`, JSON.stringify(result), {
+    EX: REFRESH_TOKEN_REUSE_GRACE_SECONDS,
+  });
+
+  return result;
 }
 
 export async function requestPasswordReset({ email }: ForgotPasswordInput) {
-  const user = await userRepository.findUserByEmailOrUsername(email);
+  const user = await userRepository.findUserByLoginIdentifier(email);
 
   if (!user) {
     logger.warn({ email }, 'User could not be found');
