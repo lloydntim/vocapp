@@ -1,3 +1,5 @@
+import { SideNavItemProps } from './SideNavItem';
+
 export const sideNavData = {
   main: [
     {
@@ -5,13 +7,12 @@ export const sideNavData = {
       href: '/dashboard',
       text: 'Overview',
       pill: 0,
-      isActive: true,
     },
     {
       icon: 'book',
-      href: '/dashboard/lists',
+      href: '/lists',
       text: 'Vocabulary lists',
-      pill: 10,
+      pill: 0,
     },
     {
       icon: 'play',
@@ -35,7 +36,7 @@ export const sideNavData = {
   account: [
     {
       icon: 'user',
-      href: '/dashboard/account/profile',
+      href: '/profile',
       text: 'Profile',
       pill: 0,
     },
@@ -46,7 +47,7 @@ export const sideNavData = {
       pill: 0,
     },
   ],
-};
+} satisfies Record<'languages' | 'account' | 'main', SideNavItemProps[]>;
 
 export const flagIconMap: Record<string, string> = {
   fr: '🇫🇷',

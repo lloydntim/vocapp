@@ -2,9 +2,9 @@ export type VocabList = {
   id: string;
   sourceLanguageCode: string;
   targetLanguageCode: string;
-  title: string;
-  mastered: number;
-  total: number;
-  lastPracticed: string;
+  name: string;
+  mastered?: number;
+  total?: number;
+  lastPracticed: string | null;
   createdAt: string;
 };

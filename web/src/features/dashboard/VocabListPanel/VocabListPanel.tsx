@@ -1,15 +1,14 @@
 import Button from '@/components/ui/Button/Button';
-import Headline from '@/components/ui/Headline/Headline';
 import Icon from '@/components/ui/Icon/Icon';
 import ProgressBar from '@/components/ui/ProgressBar/ProgressBar';
 import LangBadges from '@/features/app/components/Badges/LangBadges';
+import PanelEmptyView, {
+  PanelEmptyViewProps,
+} from '@/components/ui/PanelEmptyView/PanelEmptyView';
+import PanelHeader from '@/components/ui/PanelHeader/PanelHeader';
 
 const panelClass =
   'bg-(--surface) border border-(--border) rounded-(--radius-lg) shadow-(--shadow-sm) overflow-hidden';
-const panelHeaderClass =
-  'p-[18px_22px] flex items-center gap-[14px] border-b border-(--border) bg-(--surface)';
-const panelHeadlineClass = 'text-[18px] font-bold tracking-[-0.01em] m-0';
-const panelToolbarClass = 'ml-auto flex gap-[10px] items-center';
 const panelContentClass = 'py-2 px-0';
 
 const panelRowClass =
@@ -20,13 +19,15 @@ const panelRowListTitle =
   'font-semibold text-[14px] text-(--text) overflow-hidden text-ellipsis whitespace-nowrap';
 const panelRowListSubtitle = 'text-[12px]';
 
-interface VocabListPanelRowProps {
+export interface VocabListPanelRowProps {
+  id: string;
   sourceLang: string;
   targetLang: string;
   title: string;
-  mastered: number;
-  total: number;
-  lastPracticed: string;
+  subtitle: string;
+  // mastered: number;
+  // total: number;
+  // lastPracticed: string;
   progress: number;
   buttonLabel?: string;
   buttonIcon?: string;
@@ -37,9 +38,10 @@ function VocabListPanelRow({
   sourceLang,
   targetLang,
   title,
-  mastered,
-  total,
-  lastPracticed,
+  subtitle,
+  // mastered,
+  // total,
+  // lastPracticed,
   progress,
   buttonLabel,
   buttonIcon = 'play',
@@ -51,9 +53,7 @@ function VocabListPanelRow({
 
       <div className={panelRowListInfo}>
         <div className={panelRowListTitle}>{title}</div>
-        <div className={panelRowListSubtitle}>
-          {mastered} / {total} mastered · last {lastPracticed} ago
-        </div>
+        <div className={panelRowListSubtitle}>{subtitle}</div>
       </div>
 
       <ProgressBar progress={progress} />
@@ -70,69 +70,33 @@ function VocabListPanelRow({
   );
 }
 
-const vocablistsData: VocabListPanelRowProps[] = [
-  {
-    sourceLang: 'FR',
-    targetLang: 'EN',
-    title: "L'odyssée",
-    mastered: 22,
-    total: 35,
-    lastPracticed: '2d',
-    progress: 63,
-    buttonLabel: 'Practice',
-  },
-  {
-    sourceLang: 'FR',
-    targetLang: 'EN',
-    title: 'Mourir sur Seine 05',
-    mastered: 18,
-    total: 61,
-    lastPracticed: '5h',
-    progress: 30,
-    buttonLabel: 'Practice',
-  },
-  {
-    sourceLang: 'FR',
-    targetLang: 'EN',
-    title: 'Errors that I make',
-    mastered: 3,
-    total: 12,
-    lastPracticed: 'Today',
-    progress: 25,
-    buttonLabel: 'Practice',
-  },
-  {
-    sourceLang: 'FR',
-    targetLang: 'EN',
-    title: 'Mourir sur Seine 04',
-    mastered: 47,
-    total: 60,
-    lastPracticed: '1w',
-    progress: 78,
-    buttonLabel: 'Practice',
-  },
-];
-
 interface VocabListPanelProps {
   title: string;
   buttonLinkLabel: string;
   data: VocabListPanelRowProps[];
+  emptyViewProps: PanelEmptyViewProps;
 }
 
-function VocabListPanel({ title, buttonLinkLabel, data }: VocabListPanelProps) {
+function VocabListPanel({
+  title,
+  buttonLinkLabel,
+  data,
+  emptyViewProps,
+}: VocabListPanelProps) {
+  if (data.length === 0) {
+    return <PanelEmptyView {...emptyViewProps} />;
+  }
+
+  const toolbar = (
+    <Button isLink rank="secondary" size="small" to="/lists">
+      {buttonLinkLabel}
+      <Icon type="chevron-right" size={15} />
+    </Button>
+  );
+
   return (
     <div className={panelClass}>
-      <div className={panelHeaderClass}>
-        <Headline level="h2" className={panelHeadlineClass}>
-          {title}
-        </Headline>
-        <div className={panelToolbarClass}>
-          <Button isLink rank="secondary" size="small" to="/vocablists">
-            {buttonLinkLabel}
-            <Icon type="chevron-right" size={15} />
-          </Button>
-        </div>
-      </div>
+      <PanelHeader title={title} toolbar={toolbar} />
 
       <div className={panelContentClass}>
         {data.map((row, index) => (
@@ -142,6 +106,4 @@ function VocabListPanel({ title, buttonLinkLabel, data }: VocabListPanelProps) {
     </div>
   );
 }
-export { vocablistsData };
-
 export default VocabListPanel;
