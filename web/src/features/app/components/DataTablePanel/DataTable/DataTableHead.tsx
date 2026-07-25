@@ -1,12 +1,12 @@
 import Checkbox from '@/components/ui/Checkbox/Checkbox';
-import type { DataTableColumnItem } from './types';
+import type { DataTableColumnItem, RowControl } from './types';
 import { cn } from '@/lib/utils';
 
 interface DataTableHeadProps {
   isSelectable: boolean;
-  hasControls: boolean;
   checked: boolean;
   columns: DataTableColumnItem[];
+  controls: RowControl[];
 }
 
 const headColumnClass =
@@ -15,7 +15,7 @@ const headColumnClass =
 export default function DataTableHead({
   columns,
   isSelectable,
-  hasControls,
+  controls,
   checked,
 }: DataTableHeadProps) {
   return (
@@ -31,7 +31,7 @@ export default function DataTableHead({
             {name}
           </th>
         ))}
-        {hasControls && <th className={cn(headColumnClass, 'w-35')}></th>}
+        {!!controls && <th className={cn(headColumnClass, 'w-35')}></th>}
       </tr>
     </thead>
   );

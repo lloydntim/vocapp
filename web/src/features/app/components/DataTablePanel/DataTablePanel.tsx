@@ -1,19 +1,13 @@
-import { ChangeEvent, MouseEvent } from 'react';
-import Headline from '@/components/ui/Headline/Headline';
-import { cn } from '@/lib/utils';
+import { ChangeEvent, MouseEvent, ReactNode } from 'react';
+import DataTable, { DataTableProps } from './DataTable/DataTable';
+import PanelEmptyView, {
+  PanelEmptyViewProps,
+} from '@/components/ui/PanelEmptyView/PanelEmptyView';
+import PanelHeader from '@/components/ui/PanelHeader/PanelHeader';
 import InputField from '@/components/ui/InputField/InputField';
 import Button from '@/components/ui/Button/Button';
-import Icon from '@/components/ui/Icon/Icon';
-import DataTable, { DataTableProps } from './DataTable/DataTable';
 import Select from '@/components/ui/Select/Select';
-
-const panelTextSmall = 'text-[12px] text-(--text-dim) tracking-[0.04em]';
-const panelHeaderClass =
-  'p-[18px_22px] flex items-center gap-[14px] border-b border-(--border) bg-(--surface)';
-
-const panelHeadlineClass =
-  'text-[18px] font-bold tracking-[-0.01em] m-0 var(--text);';
-const panelToolbarClass = 'ml-auto flex gap-[10px] items-center';
+import Card from '@/components/ui/Card/Card';
 
 interface DataTablePanelHeaderProps {
   showAddButton?: boolean;
@@ -23,8 +17,8 @@ interface DataTablePanelHeaderProps {
   smallText?: string;
   resultCount?: number;
   totalCount?: number;
+  toolbar?: ReactNode;
   addButtonLabel?: string;
-  // languageFilterLabel?: string;
   searchPlaceholder?: string;
   searchId?: string;
   searchInputChangeHandler?(event: ChangeEvent<HTMLInputElement>): void;
@@ -32,97 +26,87 @@ interface DataTablePanelHeaderProps {
   languageFilterClickHandler?(value: string): void;
 }
 
-function DataTablePanelHeader({
-  searchId = 'data-table-search',
-  showAddButton = true,
-  showSearch = true,
-  showLanguageFilter = true,
-  title = 'All lists',
-  smallText = '',
-  searchPlaceholder = '',
-  addButtonLabel = '',
-  // languageFilterLabel = '',
-  searchInputChangeHandler = undefined,
-  addButtonClickHandler = undefined,
-  languageFilterClickHandler = undefined,
-}: DataTablePanelHeaderProps) {
-  return (
-    <div className={cn(panelHeaderClass)}>
-      <Headline level="h2" className={panelHeadlineClass}>
-        {title}
-      </Headline>
-      {smallText && <span className={panelTextSmall}>{smallText}</span>}
-      <div className={panelToolbarClass}>
-        {showSearch && (
-          <div className="relative flex-1" style={{ minWidth: '240px' }}>
-            <InputField
-              icon="search"
-              type="text"
-              size="small"
-              placeholder="Search lists…"
-              value={searchPlaceholder}
-              id={searchId}
-              onChange={searchInputChangeHandler}
-            />
-          </div>
-        )}
-        <div className="relative">
-          {showLanguageFilter && (
-            /*  <Button
-              isLink
-              rank="secondary"
-              size="small"
-              to="/vocablists"
-              onClick={languageFilterClickHandler}
-            >
-              {languageFilterLabel}
-              <Icon type="funnel" size={15} />
-            </Button> */
-            <Select
-              icon="funnel"
-              size="small"
-              options={[
-                { value: 'en', label: ' All languages' },
-                { value: 'fr', label: '🇫🇷 French' },
-                { value: 'es', label: '🇪🇸 Spanish' },
-                { value: 'de', label: '🇩🇪 German' },
-                { value: 'it', label: '🇮🇹 Italian' },
-              ]}
-              onValueChange={languageFilterClickHandler}
-            />
-          )}
-        </div>
-
-        {showAddButton && (
-          <Button
-            rank="primary"
-            size="small"
-            icon="plus"
-            onClick={addButtonClickHandler}
-          >
-            {addButtonLabel}
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-}
-
 interface DataTablePanelProps {
   headerProps: DataTablePanelHeaderProps;
   tableProps: DataTableProps;
+  emptyViewProps: PanelEmptyViewProps;
 }
-
 const dataTablePanelClass =
-  'bg-(--surface) border border-(--border) rounded-(--radius-lg) shadow-(--shadow-sm) overflow-hidden last:border-b-0';
+  'rounded-(--radius-lg) shadow-(--shadow-sm) p-0 last:border-b-0';
 
-function DataTablePanel({ headerProps, tableProps }: DataTablePanelProps) {
+function DataTablePanel({
+  headerProps: {
+    searchId = 'data-table-search',
+    showAddButton = true,
+    showSearch = true,
+    showLanguageFilter = true,
+    title = 'All lists',
+    smallText = '',
+    searchPlaceholder = '',
+    addButtonLabel = '',
+    searchInputChangeHandler = undefined,
+    addButtonClickHandler = undefined,
+    languageFilterClickHandler = undefined,
+  },
+  tableProps,
+  emptyViewProps,
+}: DataTablePanelProps) {
+  if (!tableProps.rows || tableProps.rows.length === 0) {
+    return <PanelEmptyView {...emptyViewProps} />;
+  }
+
+  const toolbar = (
+    <>
+      {showSearch && (
+        <div className="relative flex-1" style={{ minWidth: '240px' }}>
+          <InputField
+            icon="search"
+            type="text"
+            size="small"
+            placeholder="Search lists…"
+            value={searchPlaceholder}
+            id={searchId}
+            onChange={searchInputChangeHandler}
+          />
+        </div>
+      )}
+      <div className="relative">
+        {showLanguageFilter && (
+          <Select
+            icon="funnel"
+            size="small"
+            options={[
+              { value: 'en', label: ' All languages' },
+              { value: 'fr', label: '🇫🇷 French' },
+              { value: 'es', label: '🇪🇸 Spanish' },
+              { value: 'de', label: '🇩🇪 German' },
+              { value: 'it', label: '🇮🇹 Italian' },
+            ]}
+            onValueChange={languageFilterClickHandler}
+          />
+        )}
+      </div>
+
+      {showAddButton && (
+        <Button
+          rank="primary"
+          size="small"
+          icon="plus"
+          onClick={addButtonClickHandler}
+        >
+          {addButtonLabel}
+        </Button>
+      )}
+    </>
+  );
+
   return (
-    <div className={dataTablePanelClass}>
-      <DataTablePanelHeader {...headerProps} />
+    <Card hasBorder hasShadow className={dataTablePanelClass}>
+      <PanelHeader title={title} smallText={smallText} toolbar={toolbar} />
       <DataTable {...tableProps} />
-    </div>
+    </Card>
   );
 }
 
+export type { DataTablePanelHeaderProps };
 export default DataTablePanel;

@@ -1,4 +1,6 @@
-import Button from '@/components/ui/Button/Button';
+import ButtonGroup, {
+  ButtonItemProps,
+} from '@/components/ui/ButtonGroup/ButtonGroup';
 import Headline from '@/components/ui/Headline/Headline';
 import IconButton from '@/components/ui/IconButton/IconButton';
 import Icon from '@/components/ui/Icon/Icon';
@@ -15,13 +17,13 @@ interface ModalProps
   header: {
     title: string;
     icon?: {
-      variant: 'danger' | 'success';
+      variant: 'danger' | 'success' | 'warn';
       type: ComponentProps<typeof Icon>['type'];
     };
   };
   footer: {
-    cancelButtonProps: ComponentProps<typeof Button>;
-    saveButtonProps: ComponentProps<typeof Button>;
+    cancelButtonProps?: ButtonItemProps<'button'>;
+    saveButtonProps: ButtonItemProps<'button'>;
   };
   showCloseButton?: boolean;
   onModalClose?: () => void;
@@ -29,15 +31,15 @@ interface ModalProps
 
 const modalClass = cn(
   'bg-(--surface) border border-(--border) rounded-(--radius-lg) shadow-(--shadow-lg) text-(--text)',
-  'w-[min(520px,calc(100vw-32px))] max-h-[calc(100vh-32px)] overflow-hidden flex flex-col m-auto',
-  'animate-[rise_280ms_(--ease)] backdrop:bg-black/50',
+  'w-[min(520px,calc(100vw-32px))] max-h-[calc(100vh-32px)] overflow-hidden  m-auto',
+  'animate-[rise_280ms_(--ease)] backdrop:bg-black/50 z-1000',
 );
 const modalHeaderIconClass = 'size-9 rounded-[10px] grid place-items-center';
 const modalHeaderTitleClass = 'text-[17px] m-0 font-semibold';
 
 const modalHeaderClass =
   'py-5 px-6 flex items-center gap-[12px] border-b border-(--border)';
-const modalBodyClass = 'py-5.5 px-6 flex flex-col gap-4 overflow-auto';
+const modalBodyClass = 'py-5.5 px-6 flex flex-col gap-4';
 const modalFooterClass =
   'py-4 px-6 flex justify-end gap-2.5 border-t border-(--border) bg-(--surface-2)';
 
@@ -52,9 +54,22 @@ const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
   },
   ref,
 ) {
+  const keyDownHandler = (event: React.KeyboardEvent<HTMLDialogElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      onModalClose?.();
+    }
+  };
+
   return (
     // <div className="scrim">
-    <dialog ref={ref} className={modalClass} {...rest}>
+    <dialog
+      ref={ref}
+      className={modalClass}
+      {...rest}
+      onKeyDown={keyDownHandler}
+    >
       <div className={modalHeaderClass}>
         {icon && (
           <div
@@ -62,7 +77,9 @@ const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
               modalHeaderIconClass,
               icon.variant === 'danger'
                 ? 'bg-(--danger-soft) text-(--danger)'
-                : 'bg-(--success-soft) text-(--success)',
+                : icon.variant === 'warn'
+                  ? 'bg-(--warn-soft) text-(--warn)'
+                  : 'bg-(--success-soft) text-(--success)',
             )}
           >
             <Icon size={18} type={icon.type} />
@@ -84,15 +101,22 @@ const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
         )}
       </div>
       <div className={modalBodyClass}>{children}</div>
-      <div className={modalFooterClass}>
-        <Button rank="secondary" {...cancelButtonProps} onClick={onModalClose}>
-          {cancelButtonProps.children}
-        </Button>
-        <Button {...saveButtonProps}>{saveButtonProps.children}</Button>
-      </div>
+      <ButtonGroup
+        className={modalFooterClass}
+        stretch={false}
+        buttons={[
+          {
+            rank: 'secondary',
+            ...cancelButtonProps,
+            onClick: onModalClose,
+          },
+          saveButtonProps,
+        ]}
+      />
     </dialog>
     // </div>
   );
 });
 
+export type { ModalProps };
 export default Modal;

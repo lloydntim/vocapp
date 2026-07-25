@@ -12,7 +12,8 @@ export type RowControl = Pick<IconButtonProps, 'icon' | 'title' | 'variant'> & {
 
 export type DataTableColumnItem = {
   name: string;
-  className: string;
+  className?: string;
   isSortable: boolean;
+  type: string;
   id: string;
 };

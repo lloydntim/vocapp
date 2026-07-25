@@ -1,7 +1,6 @@
-import type { MouseEvent } from 'react';
-import { rowControls } from './rowControls';
 import { cn } from '@/lib/utils';
 import DataTableCell, { DataTableCellProps } from './DataTableCell';
+import { RowControl } from './types';
 
 const dataTableRowClass =
   'border-b border-(--border) transition-[background] duration-(--dur-fast) ease-(--ease) hover:bg-(--surface-2)';
@@ -11,17 +10,14 @@ interface DataTableRowProps {
   id: string;
   data: DataTableCellProps[];
   isSelectable: boolean;
-  hasControls: boolean;
-  editButtonClickHandler?(event: MouseEvent<HTMLButtonElement>): void;
-  practiceButtonClickHandler?(event: MouseEvent<HTMLButtonElement>): void;
-  deleteButtonClickHandler?(event: MouseEvent<HTMLButtonElement>): void;
+  controls?: RowControl[];
 }
 
 export default function DataTableRow({
-  id,
+  id: rowId,
   data,
+  controls,
   isSelectable,
-  hasControls,
 }: DataTableRowProps) {
   return (
     <tr className={dataTableRowClass}>
@@ -35,14 +31,14 @@ export default function DataTableRow({
       {data.map((cell, index) => (
         <DataTableCell key={index} className={dataTableCellClass} {...cell} />
       ))}
-      {hasControls && (
+      {!!controls && (
         <DataTableCell
           type="controls"
           className={cn(
             dataTableCellClass,
             'opacity-0 [tr:hover_&]:opacity-100',
           )}
-          props={{ rowId: id, controls: rowControls }}
+          props={{ rowId, controls }}
         />
       )}
     </tr>

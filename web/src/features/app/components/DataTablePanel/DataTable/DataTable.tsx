@@ -1,12 +1,12 @@
 import DataTableBody from './DataTableBody';
 import DataTableHead from './DataTableHead';
-import { DataTableColumnItem, DataTableRowItem } from './types';
+import { DataTableColumnItem, DataTableRowItem, RowControl } from './types';
 
 export interface DataTableProps {
   columns: DataTableColumnItem[];
   rows: DataTableRowItem[];
   isSelectable: boolean;
-  hasControls: boolean;
+  controls: RowControl[];
 }
 
 function DataTable({ columns, rows, ...rest }: DataTableProps) {

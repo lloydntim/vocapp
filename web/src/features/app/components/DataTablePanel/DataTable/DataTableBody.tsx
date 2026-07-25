@@ -1,17 +1,13 @@
 import DataTableRow from './DataTableRow';
-import { DataTableRowItem } from './types';
+import { DataTableRowItem, RowControl } from './types';
 
 interface DataTableBodyProps {
   rows: DataTableRowItem[];
   isSelectable: boolean;
-  hasControls: boolean;
+  controls: RowControl[];
 }
 
-function DataTableBody({
-  rows,
-  isSelectable,
-  hasControls,
-}: DataTableBodyProps) {
+function DataTableBody({ rows, isSelectable, controls }: DataTableBodyProps) {
   return (
     <tbody>
       {rows.map(({ id, cells }: DataTableRowItem) => (
@@ -20,7 +16,7 @@ function DataTableBody({
           id={id}
           data={cells}
           isSelectable={isSelectable}
-          hasControls={hasControls}
+          controls={controls}
         />
       ))}
     </tbody>

@@ -8,6 +8,7 @@ import IconButton, {
   IconButtonProps,
 } from '@/components/ui/IconButton/IconButton';
 import Chip from '@/components/ui/Chip/Chip';
+import Link from '@/components/ui/Link/Link';
 
 const rowListTitle =
   'font-semibold text-[14px] text-(--text) overflow-hidden text-ellipsis whitespace-nowrap';
@@ -18,6 +19,7 @@ interface DataTableCellTextProps {
   subtitle?: string;
   button?: IconButtonProps;
   type: 'primary' | 'secondary';
+  to?: string;
 }
 
 function DataTableCellText({
@@ -25,6 +27,7 @@ function DataTableCellText({
   subtitle,
   button,
   type,
+  to,
 }: DataTableCellTextProps) {
   if (type === 'secondary') {
     const numColClass = cn(
@@ -34,7 +37,24 @@ function DataTableCellText({
     return <span className={numColClass}>{title}</span>;
   }
 
-  return (
+  return to ? (
+    <Link className="hover:no-underline" href={to}>
+      <div className="flex items-center">
+        {button && (
+          <IconButton
+            variant="ghost"
+            icon={button.icon}
+            title={title as string}
+            onClick={button.onClick}
+          />
+        )}
+        <div className="flex flex-col">
+          <div className={rowListTitle}>{title}</div>
+          {subtitle && <small className={rowListSubtitle}>{subtitle}</small>}
+        </div>
+      </div>
+    </Link>
+  ) : (
     <>
       <div className="flex items-center">
         {button && (

@@ -20,8 +20,8 @@ const meta = {
       title: 'Delete this list?',
     },
     footer: {
-      cancelButtonProps: { children: 'Cancel' },
-      saveButtonProps: { children: 'Delete', rank: 'primary' },
+      cancelButtonProps: { label: 'Cancel' },
+      saveButtonProps: { label: 'Delete', rank: 'primary' },
     },
     children: 'This action cannot be undone.',
   },
