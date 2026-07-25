@@ -41,6 +41,10 @@ const loginSchema = z.object({
   password: passwordSchema,
 });
 
+export const verifyResponseSchema = z.object({
+  message: z.string(),
+});
+
 const forgotPasswordSchema = z.object({
   email: emailSchema,
 });
@@ -74,6 +78,7 @@ export const userSchema = z.object({
   lastName: z.string(),
   email: z.email(),
   username: z.string(),
+  isVerified: z.boolean(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
   role: z.enum(['ADMIN', 'USER']),
@@ -84,13 +89,14 @@ export const loginResponseSchema = z.object({
   message: z.string(),
   user: userSchema,
 });
+
 export const signupResponseSchema = z.object({
   message: z.string(),
   data: userSchema,
 });
 
 export const logoutResponseSchema = z.object({
-  success: z.boolean(),
+  message: z.string(),
 });
 
 export type User = z.infer<typeof userSchema>;
@@ -98,3 +104,4 @@ export type User = z.infer<typeof userSchema>;
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 export type SignupResponse = z.infer<typeof signupResponseSchema>;
 export type LogoutResponse = z.infer<typeof logoutResponseSchema>;
+export type VerifyResponse = z.infer<typeof verifyResponseSchema>;

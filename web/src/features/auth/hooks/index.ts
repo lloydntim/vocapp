@@ -1,8 +1,20 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 
-import { login, logout, signup } from '@/features/auth/api/auth';
+import {
+  getCurrentUser,
+  login,
+  logout,
+  signup,
+  verify,
+} from '@/features/auth/api/auth';
+
+import { currentUserQueryKey } from '../query-keys';
 
 function useLogin() {
   const queryClient = useQueryClient();
@@ -10,7 +22,7 @@ function useLogin() {
   return useMutation({
     mutationFn: login,
     onSuccess: (result) => {
-      queryClient.setQueryData(['current-user'], result.user);
+      queryClient.setQueryData(currentUserQueryKey, { data: result.user });
     },
   });
 }
@@ -32,4 +44,24 @@ function useLogout() {
   });
 }
 
-export { useLogin, useSignup, useLogout };
+function useVerify() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: verify,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: currentUserQueryKey });
+    },
+  });
+}
+
+function useCurrentUser() {
+  return useSuspenseQuery({
+    queryKey: currentUserQueryKey,
+    queryFn: getCurrentUser,
+    select: (response) => response.data,
+    // staleTime: 1000 * 60 * 5, // Data is fresh for 5 minutes. No background refetching!
+  });
+}
+
+export { useLogin, useSignup, useLogout, useVerify, useCurrentUser };

@@ -5,7 +5,7 @@ import Logo from '@/components/ui/Logo/Logo';
 import { PropsWithChildren, ReactNode } from 'react';
 
 interface AuthFormColumnProps extends PropsWithChildren {
-  authHeaderLink: ReactNode;
+  authHeaderLink?: ReactNode;
 }
 
 const authPageColumnClass =
@@ -21,7 +21,9 @@ function AuthFormColumn({ authHeaderLink, children }: AuthFormColumnProps) {
         <Logo />
         <div className={authTopRightClass}>
           <IconButton title="Toggle theme" icon="moon" onClick={() => {}} />
-          <div className={authTopLink}>{authHeaderLink}</div>
+          {authHeaderLink && (
+            <div className={authTopLink}>{authHeaderLink}</div>
+          )}
         </div>
       </div>
       {children}
