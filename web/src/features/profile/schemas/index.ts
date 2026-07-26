@@ -1,23 +1,10 @@
 import z from 'zod';
 
-export const userProfileSchema = z
-  .object({
-    id: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string(),
-    username: z.string(),
-    isVerified: z.boolean(),
-    role: z.enum(['ADMIN', 'USER']),
-    plan: z.enum(['FREE', 'PAID']),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-  })
-  .nullable();
+import { userSchema as profileSchema } from '@/features/auth/schemas';
 
 export const updateProfileResponseSchema = z.object({
   message: z.string(),
-  data: userProfileSchema,
+  data: profileSchema,
 });
 
 export type UpdateProfileResponse = z.infer<typeof updateProfileResponseSchema>;

@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import IconButton from '@/components/ui/IconButton/IconButton';
 import ProfileAvatar from '@/features/profile/components/ProfileAvatar/ProfileAvatar';
 import LogoutModal from '@/features/auth/components/LogoutModal/LogoutModal';
-import { User } from '@/features/auth/schemas';
+import { User } from '@/features/auth/types';
 
 const sideNavFooterClass =
   'mt-auto py-3 px-2.5 border-t border-white/8 flex items-center gap-2.5';

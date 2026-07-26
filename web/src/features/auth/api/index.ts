@@ -1,18 +1,16 @@
 import { clientApi } from '@/lib/client-api';
 import {
-  type LoginFormValues,
-  type LoginResponse,
   loginSchema,
   loginResponseSchema,
   SignupFormValues,
-  SignupResponse,
   signupSchema,
   signupResponseSchema,
   logoutResponseSchema,
-  User,
   verifyResponseSchema,
-  VerifyResponse,
+  LoginFormValues,
 } from '@/features/auth/schemas';
+
+import { LoginResponse, SignupResponse, User, VerifyResponse } from '../types';
 
 export async function login(data: LoginFormValues): Promise<LoginResponse> {
   const credentials = loginSchema.parse(data);

@@ -12,7 +12,7 @@ import {
   logout,
   signup,
   verify,
-} from '@/features/auth/api/auth';
+} from '@/features/auth/api';
 
 import { currentUserQueryKey } from '../query-keys';
 
