@@ -2,7 +2,7 @@
 
 import TopBar from '@/features/app/components/TopBar/TopBar';
 import Content from '@/features/app/layouts/Content/Content';
-import { useCurrentUser, useLogin, useLogout } from '@/features/auth/hooks';
+import { useCurrentUser, useLogout } from '@/features/auth/hooks';
 import ProfileCard from '@/features/profile/components/ProfileCard/ProfileCard';
 import ProfileDetails from '@/features/profile/components/ProfileDetails/ProfileDetails';
 import QueryBoundary from '@/components/ui/QueryBoundary/QueryBoundary';
@@ -22,6 +22,7 @@ import {
 } from '@/features/profile/schemas';
 import { User as Profile } from '@/features/auth/schemas';
 import Modal from '@/features/app/components/Modal/Modal';
+import { useRouter } from '@/i18n/navigation';
 
 const UPDATE_FORM_ID = 'update-profile-form';
 
@@ -39,6 +40,7 @@ function ProfileSection() {
   const updateProfileMutation = useUpdateProfileMutation();
   const deleteProfileMutation = useDeleteProfileMutation();
   const logoutMutation = useLogout();
+  const router = useRouter();
 
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 
@@ -67,6 +69,7 @@ function ProfileSection() {
     logoutMutation.mutate(undefined, {
       onSuccess: () => {
         logoutDialogRef.current?.close();
+        router.push('/login');
       },
     });
   };
@@ -87,7 +90,6 @@ function ProfileSection() {
       label: 'First name',
       placeholder: 'Enter first name',
       autoComplete: 'off',
-      // icon: 'signature',
     },
     {
       schemaKey: 'lastName',
@@ -95,7 +97,6 @@ function ProfileSection() {
       label: 'Last name',
       placeholder: 'Enter last name',
       autoComplete: 'off',
-      // icon: 'signature',
     },
   ];
 
@@ -139,7 +140,7 @@ function ProfileSection() {
         }}
       />
       <Modal
-        ref={deleteDialogRef}
+        ref={logoutDialogRef}
         header={{
           title: 'You are about to logout',
           icon: {
@@ -153,6 +154,9 @@ function ProfileSection() {
             variant: 'warn',
             onClick: () => logoutHandler(),
             loading: logoutMutation.isPending,
+          },
+          cancelButtonProps: {
+            label: 'Cancel',
           },
         }}
         onModalClose={() => {
