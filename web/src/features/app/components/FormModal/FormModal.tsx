@@ -1,7 +1,7 @@
 import Modal, { ModalProps } from '@/features/app/components/Modal/Modal';
 
-import Form, { FormProps } from '@/components/ui/Form/Form';
-import type { Ref } from 'react';
+import Form, { FormHandle, FormProps } from '@/components/ui/Form/Form';
+import { Ref, useRef } from 'react';
 import { FieldValues } from 'react-hook-form';
 
 interface FormModalProps<T extends FieldValues, TOutput extends FieldValues = T> {
@@ -15,15 +15,22 @@ function FormModal<T extends FieldValues, TOutput extends FieldValues = T>({
   modalProps,
   formProps,
 }: FormModalProps<T, TOutput>) {
+  const formRef = useRef<FormHandle<T>>(null);
+
+  const handleModalClose = () => {
+    formRef.current?.reset();
+    modalProps.onModalClose?.();
+  };
+
   return (
     <Modal
       ref={ref}
       {...{
         ...modalProps,
-        onModalClose: modalProps.onModalClose,
+        onModalClose: handleModalClose,
       }}
     >
-      <Form {...formProps} />
+      <Form {...formProps} ref={formRef} />
     </Modal>
   );
 }

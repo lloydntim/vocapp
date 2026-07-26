@@ -1,4 +1,10 @@
-import { BaseSyntheticEvent, Ref, useEffect, useState } from 'react';
+import {
+  BaseSyntheticEvent,
+  Ref,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import Button from '@/components/ui/Button/Button';
 import Checkbox from '@/components/ui/Checkbox/Checkbox';
 import InputField from '@/components/ui/InputField/InputField';
@@ -167,7 +173,12 @@ interface FormHelpers<T extends FieldValues> {
   getValues: UseFormGetValues<T>;
 }
 
+interface FormHandle<T extends FieldValues> extends FormHelpers<T> {
+  reset(): void;
+}
+
 interface FormProps<T extends FieldValues, TOutput extends FieldValues = T> {
+  ref?: Ref<FormHandle<T>>;
   id?: string;
   fields: InputDataItem<T>[];
   schema: ZodType<TOutput, T>;
@@ -186,6 +197,7 @@ interface FormProps<T extends FieldValues, TOutput extends FieldValues = T> {
 }
 
 function Form<T extends FieldValues, TOutput extends FieldValues = T>({
+  ref,
   id,
   values,
   fields: data,
@@ -206,11 +218,18 @@ function Form<T extends FieldValues, TOutput extends FieldValues = T>({
     setValue,
     getValues,
     watch,
+    reset,
     formState: { errors },
   } = useForm<T, unknown, TOutput>({
     resolver: zodResolver(schema),
     values,
   });
+
+  useImperativeHandle(
+    ref,
+    () => ({ reset: () => reset(), trigger, setValue, getValues }),
+    [reset, trigger, setValue, getValues],
+  );
 
   useEffect(() => {
     if (!onValuesChange) return;
@@ -224,9 +243,14 @@ function Form<T extends FieldValues, TOutput extends FieldValues = T>({
       id={id}
       className={authFormClass}
       method="post"
-      onSubmit={handleSubmit((data, event) =>
-        submitButtonHandler(data, { trigger, setValue, getValues }, event),
-      )}
+      onSubmit={handleSubmit((data, event) => {
+        console.log('form data', data);
+        return submitButtonHandler(
+          data,
+          { trigger, setValue, getValues },
+          event,
+        );
+      })}
     >
       {data.map(({ schemaKey, dataList, ...rest }) =>
         rest.type === 'autocomplete' ? (
@@ -272,5 +296,5 @@ function Form<T extends FieldValues, TOutput extends FieldValues = T>({
   );
 }
 
-export type { FormProps };
+export type { FormProps, FormHandle };
 export default Form;
