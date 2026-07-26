@@ -108,6 +108,7 @@ const Modal = forwardRef<HTMLDialogElement, ModalProps>(function Modal(
           {
             rank: 'secondary',
             ...cancelButtonProps,
+            label: cancelButtonProps?.label || 'Cancel',
             onClick: onModalClose,
           },
           saveButtonProps,

@@ -34,6 +34,7 @@ export interface ButtonProps {
   tabIndex?: number;
   rank?: ButtonRank;
   size?: ButtonSize;
+  form?: string;
   isLink?: boolean;
   to?: string;
   icon?: string;
@@ -69,6 +70,7 @@ export default function Button({
   target = '_blank',
   rel = 'noopener',
   loading = false,
+  form,
   ...rest
 }: ButtonProps) {
   const baseClass = cn(
@@ -167,6 +169,7 @@ export default function Button({
       className={buttonClassName}
       title={title}
       aria-label={ariaLabel}
+      form={form}
       onClick={onClick}
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}

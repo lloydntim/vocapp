@@ -20,7 +20,7 @@ import {
   UpdateProfilePayload,
   updateProfilePayloadSchema,
 } from '@/features/profile/schemas';
-import { User as Profile } from '@/features/auth/schemas';
+import { User as Profile } from '@/features/auth/types';
 import LogoutModal from '@/features/auth/components/LogoutModal/LogoutModal';
 
 const UPDATE_FORM_ID = 'update-profile-form';
@@ -36,29 +36,34 @@ function ProfileSection() {
     Partial<UpdateProfilePayload>
   >({});
   const { data: user } = useCurrentUser();
+  const { firstName, lastName, username, email, isVerified, createdAt } = user;
   const updateProfileMutation = useUpdateProfileMutation();
   const deleteProfileMutation = useDeleteProfileMutation();
 
-  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
 
   const editDialogRef = useRef<HTMLDialogElement>(null);
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
   const logoutDialogRef = useRef<HTMLDialogElement>(null);
 
+  const handleEditButtonClick = () => {
+    setEditingProfile(user);
+    setProfileFormValues({ firstName, lastName });
+    editDialogRef.current?.showModal();
+  };
+
   const editProfileHandler = (payload: UpdateProfilePayload) => {
     updateProfileMutation.mutate(payload, {
       onSuccess: () => {
+        setProfileFormValues({});
         editDialogRef.current?.close();
-        setEditingProfile(null);
       },
     });
   };
 
   const deleteProfileHandler = () => {
     deleteProfileMutation.mutate(user.id, {
-      onSuccess: () => {
-        deleteDialogRef.current?.close();
-      },
+      onSuccess: () => deleteDialogRef.current?.close(),
     });
   };
 
@@ -119,11 +124,12 @@ function ProfileSection() {
               type: 'submit' as const,
               disabled: isSaveButtonDisabled,
               loading: updateProfileMutation.isPending,
+              form: UPDATE_FORM_ID,
             },
           },
           onModalClose: () => {
-            editDialogRef.current?.close();
             setEditingProfile(null);
+            editDialogRef.current?.close();
           },
         }}
       />
@@ -134,27 +140,27 @@ function ProfileSection() {
 
       <DeleteModal
         ref={deleteDialogRef}
-        title={`Delete profile of user ${user.username}`}
-        message={`This user details of ${user.firstName} ${user.lastName[0]} will be permentantly deleted.`}
+        title={`Delete profile of user ${username}`}
+        message={`This user details of ${firstName} ${lastName[0]} will be permentantly deleted.`}
         onDelete={deleteProfileHandler}
         isLoading={deleteProfileMutation.isPending}
         onModalClose={() => {
-          deleteDialogRef.current?.close();
           setEditingProfile(null);
+          deleteDialogRef.current?.close();
         }}
       />
 
       <ProfileCard
         initials={initials}
-        name={`${user.firstName} ${user.lastName}`}
-        email={user.email}
-        isVerified={user.isVerified}
+        name={`${firstName} ${lastName}`}
+        email={email}
+        isVerified={isVerified}
         buttons={[
           {
             label: 'Edit',
             icon: 'pen-line',
             rank: 'secondary',
-            onClick: () => editDialogRef.current?.showModal(),
+            onClick: handleEditButtonClick,
           },
           {
             label: 'Logout',
@@ -170,17 +176,17 @@ function ProfileSection() {
             rows: [
               {
                 label: 'Full name',
-                value: `${user.firstName} ${user.lastName}`,
-                action: () => editDialogRef.current?.showModal(),
+                value: `${firstName} ${lastName}`,
+                action: handleEditButtonClick,
               },
               { label: 'Email', value: user.email },
               {
                 label: 'Verification',
-                value: user.isVerified ? 'Verified' : 'Unverified',
+                value: isVerified ? 'Verified' : 'Unverified',
               },
               {
                 label: 'Member since',
-                value: memberSinceFormatter.format(new Date(user.createdAt)),
+                value: memberSinceFormatter.format(new Date(createdAt)),
               },
             ],
           },
