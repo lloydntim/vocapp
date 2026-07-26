@@ -2,7 +2,7 @@
 
 import TopBar from '@/features/app/components/TopBar/TopBar';
 import Content from '@/features/app/layouts/Content/Content';
-import { useCurrentUser, useLogout } from '@/features/auth/hooks';
+import { useCurrentUser } from '@/features/auth/hooks';
 import ProfileCard from '@/features/profile/components/ProfileCard/ProfileCard';
 import ProfileDetails from '@/features/profile/components/ProfileDetails/ProfileDetails';
 import QueryBoundary from '@/components/ui/QueryBoundary/QueryBoundary';
@@ -21,8 +21,7 @@ import {
   updateProfilePayloadSchema,
 } from '@/features/profile/schemas';
 import { User as Profile } from '@/features/auth/schemas';
-import Modal from '@/features/app/components/Modal/Modal';
-import { useRouter } from '@/i18n/navigation';
+import LogoutModal from '@/features/auth/components/LogoutModal/LogoutModal';
 
 const UPDATE_FORM_ID = 'update-profile-form';
 
@@ -39,8 +38,6 @@ function ProfileSection() {
   const { data: user } = useCurrentUser();
   const updateProfileMutation = useUpdateProfileMutation();
   const deleteProfileMutation = useDeleteProfileMutation();
-  const logoutMutation = useLogout();
-  const router = useRouter();
 
   const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 
@@ -61,15 +58,6 @@ function ProfileSection() {
     deleteProfileMutation.mutate(user.id, {
       onSuccess: () => {
         deleteDialogRef.current?.close();
-      },
-    });
-  };
-
-  const logoutHandler = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        logoutDialogRef.current?.close();
-        router.push('/login');
       },
     });
   };
@@ -139,32 +127,10 @@ function ProfileSection() {
           },
         }}
       />
-      <Modal
+      <LogoutModal
         ref={logoutDialogRef}
-        header={{
-          title: 'You are about to logout',
-          icon: {
-            variant: 'warn',
-            type: 'log-out',
-          },
-        }}
-        footer={{
-          saveButtonProps: {
-            label: 'Logout',
-            variant: 'warn',
-            onClick: () => logoutHandler(),
-            loading: logoutMutation.isPending,
-          },
-          cancelButtonProps: {
-            label: 'Cancel',
-          },
-        }}
-        onModalClose={() => {
-          logoutDialogRef.current?.close();
-        }}
-      >
-        Are you sure you want to log out?
-      </Modal>
+        onModalClose={() => logoutDialogRef.current?.close()}
+      />
 
       <DeleteModal
         ref={deleteDialogRef}

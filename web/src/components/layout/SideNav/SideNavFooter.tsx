@@ -1,5 +1,9 @@
+'use client';
+
+import { useRef } from 'react';
 import IconButton from '@/components/ui/IconButton/IconButton';
 import ProfileAvatar from '@/features/profile/components/ProfileAvatar/ProfileAvatar';
+import LogoutModal from '@/features/auth/components/LogoutModal/LogoutModal';
 import { User } from '@/features/auth/schemas';
 
 const sideNavFooterClass =
@@ -11,6 +15,8 @@ interface SideNavFooterProps {
 }
 
 export default function SideNavFooter({ user }: SideNavFooterProps) {
+  const logoutDialogRef = useRef<HTMLDialogElement>(null);
+
   if (!user) {
     return null;
   }
@@ -30,6 +36,11 @@ export default function SideNavFooter({ user }: SideNavFooterProps) {
         variant="ghost"
         className={sideNavFooterIconButtonClass}
         title="Logout"
+        onClick={() => logoutDialogRef.current?.showModal()}
+      />
+      <LogoutModal
+        ref={logoutDialogRef}
+        onModalClose={() => logoutDialogRef.current?.close()}
       />
     </div>
   );
