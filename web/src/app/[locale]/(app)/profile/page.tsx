@@ -22,6 +22,7 @@ import {
 } from '@/features/profile/schemas';
 import { User as Profile } from '@/features/auth/types';
 import LogoutModal from '@/features/auth/components/LogoutModal/LogoutModal';
+import { useRouter } from 'next/navigation';
 
 const UPDATE_FORM_ID = 'update-profile-form';
 
@@ -37,6 +38,7 @@ function ProfileSection() {
   >({});
   const { data: user } = useCurrentUser();
   const { firstName, lastName, username, email, isVerified, createdAt } = user;
+  const router = useRouter();
   const updateProfileMutation = useUpdateProfileMutation();
   const deleteProfileMutation = useDeleteProfileMutation();
 
@@ -57,6 +59,7 @@ function ProfileSection() {
       onSuccess: () => {
         setProfileFormValues({});
         editDialogRef.current?.close();
+        router.refresh();
       },
     });
   };
