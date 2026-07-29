@@ -16,10 +16,14 @@ export default function errorHandler(
     });
   }
 
+  console.log(err);
   logger.error({ err }, 'Internal Error message');
 
   return res.status(500).json({
-    message: env.NODE_ENV === 'production' ? 'Internal server error' : (err.message || 'Internal server error'),
+    message:
+      env.NODE_ENV === 'production'
+        ? 'Internal server error'
+        : err.message || 'Internal server error',
     code: 'INTERNAL_ERROR',
   });
 }
