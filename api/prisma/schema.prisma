@@ -180,6 +180,8 @@ model PracticeResult {
   session PracticeSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   item    VocabularyListItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
 
+  @@unique([sessionId, itemId, startedAt])
+
   @@index([sessionId])
   @@index([itemId])
 
@@ -194,13 +196,17 @@ model PracticeSession {
   completedAt DateTime? @map("completed_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  idempotencyKey String   @map("idempotency_key") @db.Uuid
   totalHints Int   @default(0)
   totalErrors Int   @default(0)
   totalSkipped Int   @default(0)
 
+  results PracticeResult[]
+
   user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   list    VocabularyList @relation(fields: [listId], references: [id], onDelete: Cascade)
-  results PracticeResult[]
+
+  @@unique([idempotencyKey])
 
   @@map("practice_sessions")
 }

@@ -2,7 +2,7 @@ import prisma from '../../../db/client.js';
 import { PracticeSession } from '../../../generated/prisma/client.js';
 import { handlePrismaError } from '../../../utils/handlePrismaError.js';
 
-type CreateSessionInput = Pick<PracticeSession, 'userId' | 'listId' | 'startedAt'>;
+type CreateSessionInput = Pick<PracticeSession, 'startedAt' | 'idempotencyKey'>;
 type EndSessionInput = Pick<
   PracticeSession,
   'completedAt' | 'totalHints' | 'totalErrors' | 'totalSkipped'
@@ -21,25 +21,32 @@ async function findPracticeSessionByUserList(
   listId: string,
 ): Promise<PracticeSession> {
   return handlePrismaError(
-    prisma.practiceSession.findUniqueOrThrow({ where: { id, userId, listId } }),
+    prisma.practiceSession.findUniqueOrThrow({
+      where: { id, userId, listId },
+      include: { results: true },
+    }),
     { P2025: 'Practice Session does not exist for this User and List' },
   );
 }
 
-async function addPracticeSession(input: CreateSessionInput): Promise<PracticeSession> {
-  return handlePrismaError(prisma.practiceSession.create({ data: input }), {
+async function createPracticeSession(
+  userId: string,
+  listId: string,
+  input: CreateSessionInput,
+): Promise<PracticeSession> {
+  return handlePrismaError(prisma.practiceSession.create({ data: { userId, listId, ...input } }), {
     P2002: 'Practice Session could not be created',
   });
 }
 
 async function updatePracticeSession(
-  id: string,
+  sessionId: string,
   userId: string,
   listId: string,
   input: EndSessionInput,
 ): Promise<PracticeSession> {
   return handlePrismaError(
-    prisma.practiceSession.update({ where: { id, userId, listId }, data: input }),
+    prisma.practiceSession.update({ where: { id: sessionId, userId, listId }, data: input }),
     { P2025: 'Practice Session does not exist for this User and List' },
   );
 }
@@ -47,6 +54,6 @@ async function updatePracticeSession(
 export default {
   findPracticeSessionsByUserList,
   findPracticeSessionByUserList,
-  addPracticeSession,
+  createPracticeSession,
   updatePracticeSession,
 };

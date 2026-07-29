@@ -11,9 +11,10 @@ import {
 } from '../lists/items/item.schema.js';
 import listController from '../lists/list.controller.js';
 import { addUserListSchema, updateUserListSchema } from '../lists/list.schema.js';
-import { addResultSchema } from '../lists/sessions/results/result.schema.js';
+import resultController from '../lists/sessions/results/result.controller.js';
+import { addResultsSchema } from '../lists/sessions/results/result.schema.js';
 import sessionController from '../lists/sessions/session.controller.js';
-import { startSessionSchema } from '../lists/sessions/session.schema.js';
+import { endSessionSchema, startSessionSchema } from '../lists/sessions/session.schema.js';
 import userController from './user.controller.js';
 import {
   updateUserSchema,
@@ -696,6 +697,73 @@ router.get(
   listItemController.getVocabListItemByUserList,
 );
 
+/**
+ * @openapi
+ * /users/{userId}/lists/{listId}/items/{itemId}/status:
+ *   patch:
+ *     summary: Update a vocabulary list item's status
+ *     tags:
+ *       - Users
+ *       - Lists
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 550e8400-e29b-41d4-a716-446655440000
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 660e8400-e29b-41d4-a716-446655440001
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 770e8400-e29b-41d4-a716-446655440002
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [LEARNING, MASTERED]
+ *                 example: MASTERED
+ *     responses:
+ *       200:
+ *         description: Vocabulary list item status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Vocabulary list item status updated successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/VocabularyListItem'
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Missing or invalid access token
+ *       403:
+ *         description: Forbidden – list belongs to another user
+ *       404:
+ *         description: Item not found
+ */
 router.patch(
   '/:userId/lists/:listId/items/:itemId/status',
   authenticate,
@@ -704,6 +772,48 @@ router.patch(
   listItemController.updateVocabListItemStatus,
 );
 
+/**
+ * @openapi
+ * /users/{userId}/lists/{listId}/items/{itemId}:
+ *   delete:
+ *     summary: Delete a vocabulary list item
+ *     tags:
+ *       - Users
+ *       - Lists
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 550e8400-e29b-41d4-a716-446655440000
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 660e8400-e29b-41d4-a716-446655440001
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 770e8400-e29b-41d4-a716-446655440002
+ *     responses:
+ *       204:
+ *         description: Vocabulary list item deleted successfully
+ *       401:
+ *         description: Missing or invalid access token
+ *       403:
+ *         description: Forbidden – list belongs to another user
+ *       404:
+ *         description: Item not found
+ */
 router.delete(
   '/:userId/lists/:listId/items/:itemId',
   authenticate,
@@ -850,6 +960,14 @@ router.get(
  *           type: string
  *           format: uuid
  *         example: 660e8400-e29b-41d4-a716-446655440001
+ *       - in: header
+ *         name: Idempotency-Key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Unique key that lets a retried request safely reuse the original result instead of starting a duplicate session.
+ *         example: 8cd338ef-e764-4660-92b6-9b4194d90e70
  *     requestBody:
  *       required: true
  *       content:
@@ -864,6 +982,18 @@ router.get(
  *                 format: date-time
  *                 example: "2025-01-15T10:00:00.000Z"
  *     responses:
+ *       200:
+ *         description: Idempotency key matched an already-completed session; the existing session is returned instead of creating a new one
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Practice retrieved successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/PracticeSession'
  *       201:
  *         description: Practice session started successfully
  *         content:
@@ -873,7 +1003,7 @@ router.get(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Practice session started successfully
+ *                   example: Practice session created successfully
  *                 data:
  *                   $ref: '#/components/schemas/PracticeSession'
  *       400:
@@ -884,6 +1014,8 @@ router.get(
  *         description: Forbidden – list belongs to another user
  *       404:
  *         description: Vocabulary list not found
+ *       409:
+ *         description: A request with the same idempotency key is already being processed
  */
 router.post(
   '/:userId/lists/:listId/sessions',
@@ -895,9 +1027,9 @@ router.post(
 
 /**
  * @openapi
- * /users/{userId}/lists/{listId}/sessions/{sessionId}/results:
- *   post:
- *     summary: Add a practice result to a session
+ * /users/{userId}/lists/{listId}/sessions/{sessionId}:
+ *   patch:
+ *     summary: End a practice session
  *     tags:
  *       - Users
  *       - Lists
@@ -932,40 +1064,30 @@ router.post(
  *           schema:
  *             type: object
  *             required:
- *               - sourceText
- *               - targetText
- *               - startedAt
+ *               - completedAt
+ *               - totalHints
+ *               - totalErrors
+ *               - totalSkipped
  *             properties:
- *               sourceText:
- *                 type: string
- *                 example: apple
- *               targetText:
- *                 type: string
- *                 example: la pomme
- *               startedAt:
- *                 type: string
- *                 format: date-time
- *                 example: "2025-01-15T10:01:00.000Z"
- *               itemId:
- *                 type: string
- *                 format: uuid
- *                 example: 770e8400-e29b-41d4-a716-446655440002
  *               completedAt:
  *                 type: string
  *                 format: date-time
- *                 example: "2025-01-15T10:01:05.000Z"
- *               hints:
+ *                 example: "2025-01-15T10:15:00.000Z"
+ *               totalHints:
  *                 type: integer
+ *                 minimum: 0
+ *                 example: 3
+ *               totalErrors:
+ *                 type: integer
+ *                 minimum: 0
  *                 example: 1
- *               errors:
+ *               totalSkipped:
  *                 type: integer
+ *                 minimum: 0
  *                 example: 0
- *               skipped:
- *                 type: boolean
- *                 example: false
  *     responses:
- *       201:
- *         description: Practice result added successfully
+ *       200:
+ *         description: Practice session ended successfully
  *         content:
  *           application/json:
  *             schema:
@@ -973,9 +1095,120 @@ router.post(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Practice result added successfully
+ *                   example: Practice session ended successfully
  *                 data:
- *                   $ref: '#/components/schemas/PracticeResult'
+ *                   $ref: '#/components/schemas/PracticeSession'
+ *       400:
+ *         description: Validation error
+ *       401:
+ *         description: Missing or invalid access token
+ *       403:
+ *         description: Forbidden – session belongs to another user
+ *       404:
+ *         description: Practice session not found
+ */
+router.patch(
+  '/:userId/lists/:listId/sessions/:sessionId',
+  authenticate,
+  validate(endSessionSchema),
+  authorizeOwner,
+  sessionController.endSession,
+);
+
+/**
+ * @openapi
+ * /users/{userId}/lists/{listId}/sessions/{sessionId}/results/batch:
+ *   post:
+ *     summary: Add a batch of practice results to a session
+ *     tags:
+ *       - Users
+ *       - Lists
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 550e8400-e29b-41d4-a716-446655440000
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 660e8400-e29b-41d4-a716-446655440001
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 880e8400-e29b-41d4-a716-446655440003
+ *       - in: header
+ *         name: Idempotency-Key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Unique key that lets a retried request safely resubmit the same batch without creating duplicate results.
+ *         example: 8cd338ef-e764-4660-92b6-9b4194d90e70
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - results
+ *             properties:
+ *               results:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - sourceText
+ *                     - targetText
+ *                     - startedAt
+ *                   properties:
+ *                     sourceText:
+ *                       type: string
+ *                       example: apple
+ *                     targetText:
+ *                       type: string
+ *                       example: la pomme
+ *                     startedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-15T10:01:00.000Z"
+ *                     completedAt:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "2025-01-15T10:01:05.000Z"
+ *                     hints:
+ *                       type: integer
+ *                       minimum: 0
+ *                       example: 1
+ *                     errors:
+ *                       type: integer
+ *                       minimum: 0
+ *                       example: 0
+ *                     skipped:
+ *                       type: boolean
+ *                       example: false
+ *     responses:
+ *       201:
+ *         description: Practice results created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Practice results created successfully
  *       400:
  *         description: Validation error
  *       401:
@@ -986,11 +1219,11 @@ router.post(
  *         description: Practice session not found
  */
 router.post(
-  '/:userId/lists/:listId/sessions/:sessionId/results',
+  '/:userId/lists/:listId/sessions/:sessionId/results/batch',
   authenticate,
-  validate(addResultSchema),
+  validate(addResultsSchema),
   authorizeOwner,
-  sessionController.startSession,
+  resultController.addResults,
 );
 
 export default router;

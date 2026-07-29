@@ -34,23 +34,23 @@ async function getResultByUserListSession(
   });
 }
 
-async function addResult(
+async function addResults(
   req: Request<{ userId: string; listId: string; sessionId: string }>,
   res: Response<ResultResponse>,
 ) {
   const { userId, listId, sessionId } = req.params;
-  const result = await resultService.addResult(userId, listId, sessionId, req.body);
 
-  logger.info({ userId, listId, sessionId }, 'Practice result added');
+  await resultService.addResults(userId, listId, sessionId, req.body.results);
+
+  logger.info({ userId, listId, sessionId }, 'Practice results created');
 
   return res.status(201).json({
-    message: 'Practice result added successfully',
-    data: result,
+    message: 'Practice results created successfully',
   });
 }
 
 export default {
   getResultsByUserListSession,
   getResultByUserListSession,
-  addResult,
+  addResults,
 };

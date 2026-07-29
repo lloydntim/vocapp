@@ -121,6 +121,7 @@ const swaggerSpec = swaggerJsdoc({
             listId: { type: 'string', format: 'uuid' },
             startedAt: { type: 'string', format: 'date-time' },
             completedAt: { type: 'string', format: 'date-time', nullable: true },
+            idempotencyKey: { type: 'string', format: 'uuid' },
             totalHints: { type: 'integer', example: 2 },
             totalErrors: { type: 'integer', example: 1 },
             totalSkipped: { type: 'integer', example: 0 },
