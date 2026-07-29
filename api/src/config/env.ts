@@ -17,6 +17,10 @@ const envSchema = z.object({
   GCS_CLIENT_EMAIL: z.string().email(),
   GCS_PRIVATE_KEY: z.string().min(32),
   GCS_PROJECT_LOCATION: z.string(),
+  AWS_REGION: z.string(),
+  AWS_ACCESS_KEY_ID: z.string(),
+  AWS_SECRET_ACCESS_KEY: z.string(),
+  AWS_BUCKET_NAME: z.string(),
   REDIS_URL: z.string(),
 });
 
