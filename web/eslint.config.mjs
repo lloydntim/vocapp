@@ -24,6 +24,10 @@ const eslintConfig = defineConfig([
           destructuredArrayIgnorePattern: "^_",
         },
       ],
+      // Flags every setState call inside an effect, including legitimate
+      // syncs with impure external state (e.g. Date.now()) that can't be
+      // computed during render.
+      "react-hooks/set-state-in-effect": "off",
     },
   },
 ]);

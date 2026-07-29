@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(process.cwd(), '..'),
   },
+  experimental: {
+    staleTimes: {
+      dynamic: 30,
+    },
+  },
 };
 
 export default withNextIntl(nextConfig);

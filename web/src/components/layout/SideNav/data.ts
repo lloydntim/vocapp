@@ -14,12 +14,12 @@ export const sideNavData = {
       text: 'Vocabulary lists',
       pill: 0,
     },
-    {
+    /*     {
       icon: 'play',
-      href: '/dashboard/practice',
+      href: '/practice',
       text: 'Practice',
       pill: 0,
-    },
+    }, */
     {
       icon: 'bar-chart2',
       href: '/dashboard/stats',

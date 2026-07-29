@@ -49,6 +49,7 @@ import {
   CircleCheck,
   List,
   Languages,
+  Star,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
@@ -106,6 +107,7 @@ const iconMap = {
   'triangle-alert': TriangleAlert,
   list: List,
   language: Languages,
+  star: Star,
 } as Record<string, LucideIcon>;
 
 function Icon({ type = '', ...rest }: IconProps) {

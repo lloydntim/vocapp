@@ -59,7 +59,13 @@ function ListSummarySection({ listId }: { listId: string }) {
         title={list.name}
         backLink="/lists"
       >
-        <Button icon="play" title="Practice" onClick={() => {}}>
+        <Button
+          icon="play"
+          title="Practice"
+          isLink
+          to={`/lists/${listId}/practice`}
+          target="_self"
+        >
           Practice
         </Button>
       </ContentHeader>
