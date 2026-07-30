@@ -15,20 +15,20 @@ interface VocabListSummaryBarProps {
 
 function VocabListSummaryBar(props: VocabListSummaryBarProps) {
   return (
-    <Card hasBorder className="panel mb-5 py-5 px-6 flex  gap-6 flex-wrap">
-      <div>
+    <Card hasBorder className="panel mb-5 py-5 px-6 flex gap-6 flex-wrap">
+      <div className="shrink-0">
         <div className={miniTextClass}>Words</div>
         <div className={largeTextClass}>{props.total}</div>
       </div>
-      <div>
+      <div className="shrink-0">
         <div className={miniTextClass}>Mastered</div>
         <div className={cn(largeTextClass, 'text-(--success)')}>
           {props.mastered}
         </div>
       </div>
-      <div>
+      <div className="shrink-0">
         <div className={miniTextClass}>Last practiced</div>
-        <div className={cn(largeTextClass, 'font-[600')}>
+        <div className={cn(largeTextClass, 'font-[600]')}>
           {props.lastPracticed || 'Never'}
         </div>
       </div>
