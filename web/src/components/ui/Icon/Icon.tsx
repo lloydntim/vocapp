@@ -50,6 +50,7 @@ import {
   List,
   Languages,
   Star,
+  Monitor,
 } from 'lucide-react';
 import { ComponentType } from 'react';
 
@@ -108,6 +109,7 @@ const iconMap = {
   list: List,
   language: Languages,
   star: Star,
+  monitor: Monitor,
 } as Record<string, LucideIcon>;
 
 function Icon({ type = '', ...rest }: IconProps) {

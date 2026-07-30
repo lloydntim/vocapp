@@ -4,7 +4,7 @@ import './global.css';
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
-    <html className="dark">
+    <html suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>

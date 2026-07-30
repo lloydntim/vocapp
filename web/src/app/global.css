@@ -3,6 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  color-scheme: light;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
   --teal-50: #e6f1f0;
@@ -50,7 +51,7 @@
 }
 
 .dark {
-  /* [data-theme="dark"] { */
+  color-scheme: dark;
   --bg: #0b1414;
   --surface: #111d1d;
   --surface-2: #162424;

@@ -1,5 +1,6 @@
 import Headline from '@/components/ui/Headline/Headline';
 import IconButton from '@/components/ui/IconButton/IconButton';
+import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher/ThemeSwitcher';
 
 const topbarClass =
   'h-16 px-7 flex items-center gap-4 bg-(--surface) border-b border-(--border) sticky top-0 z-30 py-2';
@@ -31,7 +32,7 @@ function TopBar({ path, title }: TopBarProps) {
         </Headline>
       </div>
       <div className={topbarRightClass}>
-        <IconButton icon="sun" variant="ghost" title="Toggle theme" />
+        <ThemeSwitcher />
       </div>
     </header>
   );
