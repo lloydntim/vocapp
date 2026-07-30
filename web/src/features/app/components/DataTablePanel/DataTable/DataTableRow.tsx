@@ -29,14 +29,18 @@ export default function DataTableRow({
         />
       )}
       {data.map((cell, index) => (
-        <DataTableCell key={index} className={dataTableCellClass} {...cell} />
+        <DataTableCell
+          key={index}
+          {...cell}
+          className={cn(dataTableCellClass, cell.className)}
+        />
       ))}
       {!!controls && (
         <DataTableCell
           type="controls"
           className={cn(
             dataTableCellClass,
-            'opacity-0 [tr:hover_&]:opacity-100',
+            'opacity-100 md:opacity-0 md:[tr:hover_&]:opacity-100',
           )}
           props={{ rowId, controls }}
         />

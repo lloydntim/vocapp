@@ -17,7 +17,7 @@ export const itemColumnConfigData = [
   },
   {
     name: 'Status',
-    className: 'w-30',
+    className: 'w-30 hidden md:table-cell',
     isSortable: true,
     id: 'status',
     type: 'chip',

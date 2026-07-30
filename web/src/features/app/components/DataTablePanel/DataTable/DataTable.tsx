@@ -11,8 +11,8 @@ export interface DataTableProps {
 
 function DataTable({ columns, rows, ...rest }: DataTableProps) {
   return (
-    <div>
-      <table className="w-full border-collapse font-[14px]">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[560px] border-collapse font-[14px]">
         <DataTableHead checked={false} columns={columns} {...rest} />
         <DataTableBody rows={rows} {...rest} />
       </table>

@@ -66,6 +66,7 @@ export const buildListItemTableRows = (
       },
       {
         type: 'chip',
+        className: 'hidden md:table-cell',
         props: {
           className: 'w-full',
           label: row.status,
