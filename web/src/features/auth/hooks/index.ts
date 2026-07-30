@@ -10,6 +10,8 @@ import {
   getCurrentUser,
   login,
   logout,
+  requestPasswordReset,
+  resetPassword,
   signup,
   verify,
 } from '@/features/auth/api';
@@ -55,6 +57,18 @@ function useVerify() {
   });
 }
 
+function useForgotPassword() {
+  return useMutation({
+    mutationFn: requestPasswordReset,
+  });
+}
+
+function useResetPassword() {
+  return useMutation({
+    mutationFn: resetPassword,
+  });
+}
+
 function useCurrentUser() {
   return useSuspenseQuery({
     queryKey: currentUserQueryKey,
@@ -64,4 +78,12 @@ function useCurrentUser() {
   });
 }
 
-export { useLogin, useSignup, useLogout, useVerify, useCurrentUser };
+export {
+  useLogin,
+  useSignup,
+  useLogout,
+  useVerify,
+  useForgotPassword,
+  useResetPassword,
+  useCurrentUser,
+};

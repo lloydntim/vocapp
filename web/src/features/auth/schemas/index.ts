@@ -98,3 +98,11 @@ export const signupResponseSchema = z.object({
 export const logoutResponseSchema = z.object({
   message: z.string(),
 });
+
+export const forgotPasswordResponseSchema = z.object({
+  message: z.string(),
+});
+
+export const resetPasswordResponseSchema = z.object({
+  message: z.string(),
+});

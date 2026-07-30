@@ -8,9 +8,20 @@ import {
   logoutResponseSchema,
   verifyResponseSchema,
   LoginFormValues,
+  ForgotPasswordFormValues,
+  forgotPasswordSchema,
+  forgotPasswordResponseSchema,
+  resetPasswordResponseSchema,
 } from '@/features/auth/schemas';
 
-import { LoginResponse, SignupResponse, User, VerifyResponse } from '../types';
+import {
+  ForgotPasswordResponse,
+  LoginResponse,
+  ResetPasswordResponse,
+  SignupResponse,
+  User,
+  VerifyResponse,
+} from '../types';
 
 export async function login(data: LoginFormValues): Promise<LoginResponse> {
   const credentials = loginSchema.parse(data);
@@ -46,6 +57,29 @@ export async function verify(payload: {
     body: JSON.stringify({ token }),
   });
   return verifyResponseSchema.parse(response);
+}
+
+export async function requestPasswordReset(
+  data: ForgotPasswordFormValues,
+): Promise<ForgotPasswordResponse> {
+  const { email } = forgotPasswordSchema.parse(data);
+
+  const response = await clientApi<unknown>('/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email }),
+  });
+  return forgotPasswordResponseSchema.parse(response);
+}
+
+export async function resetPassword(payload: {
+  token: string;
+  password: string;
+}): Promise<ResetPasswordResponse> {
+  const response = await clientApi<unknown>('/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return resetPasswordResponseSchema.parse(response);
 }
 
 export async function logout(): Promise<void> {
