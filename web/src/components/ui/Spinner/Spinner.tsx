@@ -27,4 +27,5 @@ function Spinner({ size = 'base', className }: SpinnerProps) {
   return <div className={cn(spinnerClass, spinnerSizeMap[size], className)} />;
 }
 
+export type { SpinnerSize };
 export default Spinner;

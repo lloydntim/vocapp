@@ -5,7 +5,7 @@ import type { ButtonRank, ButtonVariant, ButtonType } from '../Button/Button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Icon from '../Icon/Icon';
-import Spinner from '../Spinner/Spinner';
+import Spinner, { SpinnerSize } from '../Spinner/Spinner';
 
 const rankMap: Record<string, string> = {
   primary: cn(
@@ -22,10 +22,13 @@ const rankMap: Record<string, string> = {
   ),
 };
 
-const sizeMap: Record<string, { button: string; icon: number }> = {
-  small: { button: 'size-9', icon: 16 },
-  base: { button: 'size-9', icon: 16 },
-  large: { button: 'size-10', icon: 18 },
+const sizeMap: Record<
+  string,
+  { button: string; icon: number; spinner: SpinnerSize }
+> = {
+  small: { button: 'size-9', icon: 16, spinner: 'small' },
+  base: { button: 'size-9', icon: 16, spinner: 'base' },
+  large: { button: 'size-10', icon: 18, spinner: 'base' },
 };
 const ghostVariantClass =
   'bg-transparent text-(--text-muted) border-transparent shadow-none';
@@ -121,6 +124,7 @@ function IconButton({
     className,
   );
   const iconButtonIconSize = sizeMap[size].icon;
+  const iconButtonSpinnerSize = sizeMap[size].spinner;
 
   if (isLink) {
     return (
@@ -144,7 +148,7 @@ function IconButton({
       {...rest}
     >
       {loading ? (
-        <Spinner size={size} />
+        <Spinner size={iconButtonSpinnerSize} />
       ) : (
         <Icon type={icon} size={iconButtonIconSize} />
       )}
