@@ -84,6 +84,8 @@ export default function Button({
     'rounded-[10px]',
     'transition-all duration-(--dur-fast) ease-(--ease)',
     'inline-flex',
+    'shrink-0',
+    'whitespace-nowrap',
     'text-sm',
     'items-center',
     disabled && 'opacity-50 cursor-not-allowed',
