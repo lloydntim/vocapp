@@ -41,7 +41,7 @@ export const buildListTableRows = (data: VocabList[] | undefined) =>
         props: {
           progress: row.total
             ? row.total > 0
-              ? Math.round((row.mastered ?? 0 / row.total) * 100)
+              ? Math.round(((row.mastered ?? 0) / row.total) * 100)
               : 0
             : 0,
         },
