@@ -4,6 +4,8 @@ import authenticate from '../../middleware/authenticate.js';
 import authorize from '../../middleware/authorize.js';
 import authorizeOwner from '../../middleware/authorizeOwner.js';
 import validate from '../../middleware/validate.js';
+import audioController from '../audio/audio.controller.js';
+import { getItemAudioSchema } from '../audio/audio.schema.js';
 import listItemController from '../lists/items/item.controller.js';
 import {
   addUserListItemSchema,
@@ -820,6 +822,79 @@ router.delete(
   validate(userListItemParamsSchema),
   authorizeOwner,
   listItemController.deleteVocabListItem,
+);
+
+/**
+ * @openapi
+ * /users/{userId}/lists/{listId}/items/{itemId}/audio:
+ *   get:
+ *     summary: Get a text-to-speech audio clip for a vocabulary list item
+ *     description: >
+ *       Returns a time-limited, presigned URL for the source or target text audio clip.
+ *       Clips are cached in S3 by a hash of the text and language code, so repeat requests
+ *       for the same text/language pair reuse the existing clip instead of resynthesizing it.
+ *     tags:
+ *       - Users
+ *       - Lists
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 550e8400-e29b-41d4-a716-446655440000
+ *       - in: path
+ *         name: listId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 660e8400-e29b-41d4-a716-446655440001
+ *       - in: path
+ *         name: itemId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         example: 770e8400-e29b-41d4-a716-446655440002
+ *       - in: query
+ *         name: field
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [source, target]
+ *         description: Whether to return audio for the item's source or target text
+ *     responses:
+ *       200:
+ *         description: Audio clip retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Audio clip retrieved successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/AudioClip'
+ *       400:
+ *         description: Validation error – field must be "source" or "target"
+ *       401:
+ *         description: Missing or invalid access token
+ *       403:
+ *         description: Forbidden – list belongs to another user
+ *       404:
+ *         description: Item not found
+ */
+router.get(
+  '/:userId/lists/:listId/items/:itemId/audio',
+  // authenticate,
+  validate(getItemAudioSchema),
+  // authorizeOwner,
+  audioController.getVocabListItemAudio,
 );
 
 /**

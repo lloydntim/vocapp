@@ -113,6 +113,21 @@ const swaggerSpec = swaggerJsdoc({
             updatedAt: { type: 'string', format: 'date-time' },
           },
         },
+        AudioClip: {
+          type: 'object',
+          properties: {
+            audioKey: {
+              type: 'string',
+              example: 'audio/en/1f3d9c1b2a7e4f5a6b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a.mp3',
+              description: 'S3 object key, derived from a hash of the text and language code',
+            },
+            audioUrl: {
+              type: 'string',
+              format: 'uri',
+              description: 'Presigned, time-limited URL for downloading the audio clip',
+            },
+          },
+        },
         PracticeSession: {
           type: 'object',
           properties: {
