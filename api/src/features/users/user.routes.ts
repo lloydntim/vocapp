@@ -891,9 +891,9 @@ router.delete(
  */
 router.get(
   '/:userId/lists/:listId/items/:itemId/audio',
-  // authenticate,
+  authenticate,
   validate(getItemAudioSchema),
-  // authorizeOwner,
+  authorizeOwner,
   audioController.getVocabListItemAudio,
 );
 
