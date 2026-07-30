@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import DataTablePanel from '@/features/app/components/DataTablePanel/DataTablePanel';
 import TopBar from '@/features/app/components/TopBar/TopBar';
 import Content from '@/features/app/layouts/Content/Content';
@@ -10,9 +11,15 @@ import {
   modalProps,
   buildCreateListFormProps,
   buildTableData,
+  getLanguageUsage,
 } from '@/features/vocab-lists/helpers';
-import { buildLanguagesDataList } from '@/features/languages/helpers';
+import {
+  buildLanguagesDataList,
+  buildLanguageNameMap,
+  languageFlagMap,
+} from '@/features/languages/helpers';
 import { useGetLanguages } from '@/features/languages/hooks';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import {
   useCreateList,
   useDeleteList,
@@ -44,14 +51,46 @@ function VocabLists({ params }: PageProps) {
   const { data: languagesData, isLoading: isLanguagesLoading } =
     useGetLanguages();
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeLanguage = searchParams.get('language') ?? '';
+
   const listsQuery = useListsQuery();
   const lists = listsQuery.data;
+  const filteredLists = activeLanguage
+    ? lists?.filter((list) => list.targetLanguageCode === activeLanguage)
+    : lists;
 
   const createListMutation = useCreateList();
   const updateListMutation = useUpdateList(selectedListId);
   const deleteListMutation = useDeleteList();
 
   const languageDataList = buildLanguagesDataList(languagesData?.languages);
+  const languageNameMap = buildLanguageNameMap(languagesData?.languages);
+  const languageFilterOptions = [
+    { value: '', label: 'All languages' },
+    ...getLanguageUsage(lists).map(({ languageCode }) => ({
+      value: languageCode,
+      label: [
+        languageFlagMap[languageCode],
+        languageNameMap[languageCode] ?? languageCode.toUpperCase(),
+      ]
+        .filter(Boolean)
+        .join(' '),
+    })),
+  ];
+
+  const handleLanguageFilterChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set('language', value);
+    } else {
+      params.delete('language');
+    }
+    const query = params.toString();
+    router.push(`${pathname}${query ? `?${query}` : ''}`);
+  };
 
   const handleEditItem = (id: string) => {
     const list = lists?.find((list) => list.id === id);
@@ -72,7 +111,7 @@ function VocabLists({ params }: PageProps) {
   };
 
   const tableProps = {
-    ...buildTableData(lists),
+    ...buildTableData(filteredLists),
     controls: [
       {
         icon: 'play',
@@ -209,7 +248,7 @@ function VocabLists({ params }: PageProps) {
             }}
             headerProps={{
               title: 'All lists',
-              smallText: '10 of 10',
+              smallText: `${filteredLists?.length ?? 0} of ${lists?.length ?? 0}`,
               showAddButton: true,
               showSearch: true,
               showLanguageFilter: true,
@@ -218,7 +257,9 @@ function VocabLists({ params }: PageProps) {
               toolbar: null,
               searchInputChangeHandler: () => {},
               addButtonClickHandler: () => dialogRef.current?.showModal(),
-              languageFilterClickHandler: () => {},
+              languageFilterValue: activeLanguage,
+              languageFilterOptions,
+              languageFilterClickHandler: handleLanguageFilterChange,
             }}
             tableProps={tableProps}
           />

@@ -16,10 +16,11 @@ type SelectOption = {
 
 interface SelectProps extends Omit<
   SelectHTMLAttributes<HTMLSelectElement>,
-  'size'
+  'size' | 'value'
 > {
   icon?: string;
   options: SelectOption[];
+  value?: string;
   onValueChange?: (value: string) => void;
   className?: string;
   size?: ButtonSize;
@@ -36,14 +37,19 @@ function Select({
   icon = '',
   options,
   size,
+  value,
   onValueChange,
   ...rest
 }: SelectProps) {
   const [selectedValue, setSelectedValue] = useState<string | null>(
-    options[0]?.value as string | null,
+    value ?? (options[0]?.value as string | null),
   );
   const [activeValue, setActiveValue] = useState<string | null>(selectedValue);
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (value !== undefined) setSelectedValue(value);
+  }, [value]);
 
   const selectValue = useCallback(
     (value: string) => {

@@ -27,12 +27,6 @@ export const sideNavData = {
       pill: 0,
     },
   ],
-  languages: [
-    { flag: 'fr', href: '/dashboard/languages/fr', text: 'French', pill: 5 },
-    { flag: 'es', href: '/dashboard/languages/es', text: 'Spanish', pill: 3 },
-    { flag: 'de', href: '/dashboard/languages/de', text: 'German', pill: 4 },
-    { flag: 'it', href: '/dashboard/languages/it', text: 'Italian', pill: 2 },
-  ],
   account: [
     {
       icon: 'user',
@@ -47,11 +41,4 @@ export const sideNavData = {
       pill: 0,
     },
   ],
-} satisfies Record<'languages' | 'account' | 'main', SideNavItemProps[]>;
-
-export const flagIconMap: Record<string, string> = {
-  fr: '🇫🇷',
-  es: '🇪🇸',
-  de: '🇩🇪',
-  it: '🇮🇹',
-};
+} satisfies Record<'account' | 'main', SideNavItemProps[]>;

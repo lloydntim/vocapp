@@ -1,7 +1,7 @@
 import Link from '@/components/ui/Link/Link';
 import Icon from '@/components/ui/Icon/Icon';
 import { cn } from '@/lib/utils';
-import { flagIconMap } from './data';
+import { languageFlagMap } from '@/features/languages/helpers';
 
 const sideNavItemClass = cn(
   'font-normal flex flex-row items-center text-left gap-3 py-2.5 px-3 text-[13.5px]',
@@ -46,9 +46,9 @@ export default function SideNavItem({
       href={href}
     >
       {icon && <Icon size={18} type={icon} className={sideNavItemIconClass} />}
-      {flag && (
+      {flag && languageFlagMap[flag] && (
         <span className={cn(sideNavItemIconClass, 'size-4.5')}>
-          {flagIconMap[flag]}
+          {languageFlagMap[flag]}
         </span>
       )}
       {text}

@@ -9,6 +9,15 @@ import Button from '@/components/ui/Button/Button';
 import Select from '@/components/ui/Select/Select';
 import Card from '@/components/ui/Card/Card';
 
+interface LanguageFilterOption {
+  value: string;
+  label: string;
+}
+
+const defaultLanguageFilterOptions: LanguageFilterOption[] = [
+  { value: '', label: 'All languages' },
+];
+
 interface DataTablePanelHeaderProps {
   showAddButton?: boolean;
   showSearch?: boolean;
@@ -21,6 +30,8 @@ interface DataTablePanelHeaderProps {
   addButtonLabel?: string;
   searchPlaceholder?: string;
   searchId?: string;
+  languageFilterValue?: string;
+  languageFilterOptions?: LanguageFilterOption[];
   searchInputChangeHandler?(event: ChangeEvent<HTMLInputElement>): void;
   addButtonClickHandler?(event: MouseEvent<HTMLButtonElement>): void;
   languageFilterClickHandler?(value: string): void;
@@ -46,6 +57,8 @@ function DataTablePanel({
     addButtonLabel = '',
     searchInputChangeHandler = undefined,
     addButtonClickHandler = undefined,
+    languageFilterValue = '',
+    languageFilterOptions = defaultLanguageFilterOptions,
     languageFilterClickHandler = undefined,
   },
   tableProps,
@@ -75,13 +88,8 @@ function DataTablePanel({
           <Select
             icon="funnel"
             size="small"
-            options={[
-              { value: 'en', label: ' All languages' },
-              { value: 'fr', label: '🇫🇷 French' },
-              { value: 'es', label: '🇪🇸 Spanish' },
-              { value: 'de', label: '🇩🇪 German' },
-              { value: 'it', label: '🇮🇹 Italian' },
-            ]}
+            value={languageFilterValue}
+            options={languageFilterOptions}
             onValueChange={languageFilterClickHandler}
           />
         )}

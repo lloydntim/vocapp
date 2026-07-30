@@ -140,3 +140,23 @@ export const buildTableData = (data: VocabList[] | undefined) => ({
   isSelectable: true,
   controls: [],
 });
+
+export interface LanguageUsage {
+  languageCode: string;
+  count: number;
+}
+
+export const getLanguageUsage = (
+  data: VocabList[] | undefined,
+): LanguageUsage[] => {
+  const counts = new Map<string, number>();
+
+  for (const list of data ?? []) {
+    const code = list.targetLanguageCode;
+    counts.set(code, (counts.get(code) ?? 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .map(([languageCode, count]) => ({ languageCode, count }))
+    .sort((a, b) => b.count - a.count);
+};
