@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { apiRequest } from '@/features/auth/server/api';
+import { forwardJson, UpstreamError, withErrorHandling } from '@/lib/bff';
 
-export async function POST(request: Request) {
+interface RefreshResult {
+  message: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export const POST = withErrorHandling(async () => {
   const refreshToken = (await cookies()).get('refreshToken')?.value;
 
   if (!refreshToken) {
-    return NextResponse.json({ message: 'No refresh token' }, { status: 401 });
+    throw new UpstreamError('No refresh token', 401);
   }
 
   const apiResponse = await apiRequest('/auth/refresh', {
@@ -14,11 +21,7 @@ export async function POST(request: Request) {
     headers: { Cookie: `refreshToken=${refreshToken}` },
   });
 
-  const result = await apiResponse.json();
-
-  if (!apiResponse.ok) {
-    return NextResponse.json(result, { status: apiResponse.status });
-  }
+  const result = await forwardJson<RefreshResult>(apiResponse);
 
   const response = NextResponse.json({ message: result.message });
 
@@ -39,4 +42,4 @@ export async function POST(request: Request) {
   });
 
   return response;
-}
+});

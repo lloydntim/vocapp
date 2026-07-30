@@ -1,59 +1,54 @@
 import { apiRequest } from '@/features/auth/server/api';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { forwardJson, requireAccessToken, withErrorHandling } from '@/lib/bff';
 
-export async function GET(
-  _: Request,
-  {
-    params,
-  }: RouteContext<'/api/users/[userId]/lists/[listId]/sessions/[sessionId]'>,
-) {
-  const { userId, listId, sessionId } = await params;
-  const accessToken = (await cookies()).get('accessToken')?.value;
-
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
-  }
-
-  const apiResponse = await apiRequest(
-    `/users/${userId}/lists/${listId}/sessions/${sessionId}`,
+export const GET = withErrorHandling(
+  async (
+    _: Request,
     {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    },
-  );
+      params,
+    }: RouteContext<'/api/users/[userId]/lists/[listId]/sessions/[sessionId]'>,
+  ) => {
+    const { userId, listId, sessionId } = await params;
+    const accessToken = await requireAccessToken();
 
-  const result = await apiResponse.json();
-  return NextResponse.json(result, { status: apiResponse.status });
-}
-
-export async function PATCH(
-  request: Request,
-  {
-    params,
-  }: RouteContext<'/api/users/[userId]/lists/[listId]/sessions/[sessionId]'>,
-) {
-  const { userId, listId, sessionId } = await params;
-  const accessToken = (await cookies()).get('accessToken')?.value;
-
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
-  }
-
-  const body = await request.json();
-  const idempotencyKey = request.headers.get('idempotency-key');
-
-  const apiResponse = await apiRequest(
-    `/users/${userId}/lists/${listId}/sessions/${sessionId}`,
-    {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+    const apiResponse = await apiRequest(
+      `/users/${userId}/lists/${listId}/sessions/${sessionId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
       },
-      body: JSON.stringify(body),
-    },
-  );
+    );
 
-  const result = await apiResponse.json();
-  return NextResponse.json(result, { status: apiResponse.status });
-}
+    const result = await forwardJson(apiResponse);
+    return NextResponse.json(result, { status: apiResponse.status });
+  },
+);
+
+export const PATCH = withErrorHandling(
+  async (
+    request: Request,
+    {
+      params,
+    }: RouteContext<'/api/users/[userId]/lists/[listId]/sessions/[sessionId]'>,
+  ) => {
+    const { userId, listId, sessionId } = await params;
+    const accessToken = await requireAccessToken();
+    const body = await request.json();
+    const idempotencyKey = request.headers.get('idempotency-key');
+
+    const apiResponse = await apiRequest(
+      `/users/${userId}/lists/${listId}/sessions/${sessionId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+        },
+        body: JSON.stringify(body),
+      },
+    );
+
+    const result = await forwardJson(apiResponse);
+    return NextResponse.json(result, { status: apiResponse.status });
+  },
+);

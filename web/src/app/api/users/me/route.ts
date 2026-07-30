@@ -1,13 +1,9 @@
-import { cookies } from 'next/headers';
-
 import { NextResponse } from 'next/server';
 import { apiRequest } from '@/features/auth/server/api';
+import { forwardJson, requireAccessToken, withErrorHandling } from '@/lib/bff';
 
-export async function GET() {
-  const accessToken = (await cookies()).get('accessToken')?.value;
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
-  }
+export const GET = withErrorHandling(async () => {
+  const accessToken = await requireAccessToken();
 
   const apiResponse = await apiRequest('/users/me', {
     headers: {
@@ -15,7 +11,6 @@ export async function GET() {
     },
   });
 
-  const result = await apiResponse.json();
-
+  const result = await forwardJson(apiResponse);
   return NextResponse.json(result, { status: apiResponse.status });
-}
+});

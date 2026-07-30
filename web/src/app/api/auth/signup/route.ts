@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { apiRequest } from '@/features/auth/server/api';
+import { forwardJson, withErrorHandling } from '@/lib/bff';
 
-export async function POST(request: Request) {
+export const POST = withErrorHandling(async (request: Request) => {
   const body = await request.json();
 
   const apiResponse = await apiRequest('/auth/register', {
@@ -9,7 +10,6 @@ export async function POST(request: Request) {
     body: JSON.stringify(body),
   });
 
-  const result = await apiResponse.json();
-
+  const result = await forwardJson(apiResponse);
   return NextResponse.json(result, { status: apiResponse.status });
-}
+});

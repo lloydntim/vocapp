@@ -1,64 +1,60 @@
 import { apiRequest } from '@/features/auth/server/api';
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { forwardJson, requireAccessToken, withErrorHandling } from '@/lib/bff';
 
-export async function GET(
-  _: Request,
-  { params }: RouteContext<'/api/users/[userId]/lists/[listId]'>,
-) {
-  const { userId, listId } = await params;
-  const accessToken = (await cookies()).get('accessToken')?.value;
+export const GET = withErrorHandling(
+  async (
+    _: Request,
+    { params }: RouteContext<'/api/users/[userId]/lists/[listId]'>,
+  ) => {
+    const { userId, listId } = await params;
+    const accessToken = await requireAccessToken();
 
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
-  }
+    const apiResponse = await apiRequest(`/users/${userId}/lists/${listId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
 
-  const apiResponse = await apiRequest(`/users/${userId}/lists/${listId}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
+    const result = await forwardJson(apiResponse);
+    return NextResponse.json(result, { status: apiResponse.status });
+  },
+);
 
-  const result = await apiResponse.json();
-  return NextResponse.json(result, { status: apiResponse.status });
-}
+export const PATCH = withErrorHandling(
+  async (
+    request: Request,
+    { params }: RouteContext<'/api/users/[userId]/lists/[listId]'>,
+  ) => {
+    const { userId, listId } = await params;
+    const accessToken = await requireAccessToken();
+    const body = await request.json();
 
-export async function PATCH(
-  request: Request,
-  { params }: RouteContext<'/api/users/[userId]/lists/[listId]'>,
-) {
-  const { userId, listId } = await params;
-  const accessToken = (await cookies()).get('accessToken')?.value;
+    const apiResponse = await apiRequest(`/users/${userId}/lists/${listId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    });
 
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
-  }
+    const result = await forwardJson(apiResponse);
+    return NextResponse.json(result, { status: apiResponse.status });
+  },
+);
 
-  const body = await request.json();
+export const DELETE = withErrorHandling(
+  async (
+    _: Request,
+    { params }: RouteContext<'/api/users/[userId]/lists/[listId]'>,
+  ) => {
+    const { userId, listId } = await params;
+    const accessToken = await requireAccessToken();
 
-  const apiResponse = await apiRequest(`/users/${userId}/lists/${listId}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    method: 'PATCH',
-    body: JSON.stringify(body),
-  });
+    const apiResponse = await apiRequest(`/users/${userId}/lists/${listId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      method: 'DELETE',
+    });
 
-  const result = await apiResponse.json();
-  return NextResponse.json(result, { status: apiResponse.status });
-}
-
-export async function DELETE(
-  _: Request,
-  { params }: RouteContext<'/api/users/[userId]/lists/[listId]'>,
-) {
-  const { userId, listId } = await params;
-  const accessToken = (await cookies()).get('accessToken')?.value;
-
-  if (!accessToken) {
-    return NextResponse.json({ message: 'Unauthenticated' }, { status: 401 });
-  }
-
-  const apiResponse = await apiRequest(`/users/${userId}/lists/${listId}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    method: 'DELETE',
-  });
-
-  return new NextResponse(null, { status: apiResponse.status });
-}
+    // Success (204) has no body to parse. On failure, forwardJson throws
+    // with the upstream's real status/message instead of losing it.
+    if (!apiResponse.ok) await forwardJson(apiResponse);
+    return new NextResponse(null, { status: apiResponse.status });
+  },
+);

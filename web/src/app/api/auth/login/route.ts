@@ -1,8 +1,16 @@
 // web/src/app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import { apiRequest } from '@/features/auth/server/api';
+import { forwardJson, withErrorHandling } from '@/lib/bff';
 
-export async function POST(request: Request) {
+interface LoginResult {
+  message: string;
+  data: unknown;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export const POST = withErrorHandling(async (request: Request) => {
   const credentials = await request.json();
 
   const apiResponse = await apiRequest('/auth/login', {
@@ -10,11 +18,7 @@ export async function POST(request: Request) {
     body: JSON.stringify(credentials),
   });
 
-  const result = await apiResponse.json();
-
-  if (!apiResponse.ok) {
-    return NextResponse.json(result, { status: apiResponse.status });
-  }
+  const result = await forwardJson<LoginResult>(apiResponse);
 
   const response = NextResponse.json({
     message: result.message,
@@ -38,4 +42,4 @@ export async function POST(request: Request) {
   });
 
   return response;
-}
+});

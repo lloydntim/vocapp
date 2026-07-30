@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 import { apiRequest } from '@/features/auth/server/api';
+import { forwardJson, withErrorHandling } from '@/lib/bff';
 
-export async function POST(request: Request) {
+interface VerifyResult {
+  message: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export const POST = withErrorHandling(async (request: Request) => {
   const body = await request.json();
 
   const apiResponse = await apiRequest('/auth/verify', {
@@ -9,11 +16,7 @@ export async function POST(request: Request) {
     body: JSON.stringify(body),
   });
 
-  const result = await apiResponse.json();
-
-  if (!apiResponse.ok) {
-    return NextResponse.json(result, { status: apiResponse.status });
-  }
+  const result = await forwardJson<VerifyResult>(apiResponse);
 
   const response = NextResponse.json({ message: result.message });
 
@@ -34,4 +37,4 @@ export async function POST(request: Request) {
   });
 
   return response;
-}
+});
