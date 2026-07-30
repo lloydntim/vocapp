@@ -56,6 +56,15 @@ function refreshAccessToken(refreshToken: string): Promise<RefreshResult | null>
         const result = await response.json();
         return { accessToken: result.accessToken, refreshToken: result.refreshToken };
       })
+      .catch((error) => {
+        // apiRequest can throw (network failure, timeout) rather than
+        // resolve to a Response — without this, that rejection would
+        // propagate out of the unguarded `await` in proxy() below and
+        // fail the whole navigation instead of just falling through to
+        // an unauthenticated page load.
+        console.error('Silent access-token refresh failed:', error);
+        return null;
+      })
       .finally(() => {
         pendingRefreshes.delete(refreshToken);
       });
