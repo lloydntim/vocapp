@@ -92,7 +92,8 @@ function PracticeResultPanels({
   const totalSeconds = Math.max(0, Math.round(totalTimeMs / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  const totalTimeLabel = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+  const totalTimeLabel =
+    minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
 
   const tiles = [
     {
@@ -148,8 +149,9 @@ function PracticeResultPanels({
 
         <div className={subheadlineClass}>
           You practiced{' '}
-          <strong className="text-(--text)">{totalPhrases} phrases</strong>{' '}
-          and got <strong className="text-(--success)">{correctCount} correct</strong>.
+          <strong className="text-(--text)">{totalPhrases} phrases</strong> and
+          got{' '}
+          <strong className="text-(--success)">{correctCount} correct</strong>.
         </div>
       </Card>
 
@@ -176,6 +178,7 @@ function PracticeResultPanels({
         })}
       </Card>
       <ButtonGroup
+        type="button"
         buttons={[
           {
             className:
@@ -184,7 +187,9 @@ function PracticeResultPanels({
             size: 'small',
             icon: 'book',
             label: 'Back to list',
+            target: '_self',
             isLink: true,
+            type: 'button',
             to: `/lists/${listId}`,
           },
           {
