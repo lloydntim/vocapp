@@ -165,7 +165,7 @@ export async function requestPasswordReset({ email }: ForgotPasswordInput) {
 
   if (!user) {
     logger.warn({ email }, 'User could not be found');
-    throw new BadRequestError('Reset token is invalid or expired');
+    throw new BadRequestError('No account found with that email address');
   }
 
   // create access token
