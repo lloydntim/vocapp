@@ -56,15 +56,17 @@ function VocabListPanelRow({
         <div className={panelRowListSubtitle}>{subtitle}</div>
       </div>
 
-      <ProgressBar progress={progress} />
+      <ProgressBar progress={progress} className="hidden sm:flex" />
 
       <Button
         rank="primary"
         icon={buttonIcon}
         size="small"
+        title={buttonLabel}
+        ariaLabel={buttonLabel}
         onClick={buttonClickHandler}
       >
-        {buttonLabel}
+        <span className="hidden sm:inline">{buttonLabel}</span>
       </Button>
     </div>
   );
