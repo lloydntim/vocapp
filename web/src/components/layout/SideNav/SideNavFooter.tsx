@@ -7,8 +7,9 @@ import LogoutModal from '@/features/auth/components/LogoutModal/LogoutModal';
 import { User } from '@/features/auth/types';
 
 const sideNavFooterClass =
-  'mt-auto py-3 px-2.5 border-t border-white/8 flex items-center gap-2.5';
-const sideNavFooterIconButtonClass = 'ml-auto text-white/60 border-transparent';
+  'mt-auto py-3 px-2.5 border-t border-(--border) flex items-center gap-2.5 md:justify-center lg:justify-start';
+const sideNavFooterIconButtonClass =
+  'ml-auto text-(--text-dim) border-transparent md:hidden lg:grid';
 
 interface SideNavFooterProps {
   user: Pick<User, 'firstName' | 'lastName' | 'plan'>;
@@ -27,9 +28,9 @@ export default function SideNavFooter({ user }: SideNavFooterProps) {
   return (
     <div className={sideNavFooterClass}>
       <ProfileAvatar initials={userInitials} size="small" />
-      <div className="text-sm leading-[1.2]">
+      <div className="hidden lg:block text-sm leading-[1.2]">
         {`${firstName} ${lastName.slice(0, 1).toLocaleUpperCase()}.`}
-        <small className="text-white/50 text-11px flex">{`${plan[0]}${plan.slice(1, plan.length).toLocaleLowerCase()} plan`}</small>
+        <small className="text-(--text-dim) text-11px flex">{`${plan[0]}${plan.slice(1, plan.length).toLocaleLowerCase()} plan`}</small>
       </div>
       <IconButton
         icon="log-out"

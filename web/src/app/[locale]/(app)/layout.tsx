@@ -5,6 +5,7 @@ import SideNav from '@/components/layout/SideNav/SideNav';
 import SideNavHeader from '@/components/layout/SideNav/SideNavHeader';
 import SideNavSections from '@/components/layout/SideNav/SideNavSections';
 import SideNavFooter from '@/components/layout/SideNav/SideNavFooter';
+import SideNavMobileMenu from '@/components/layout/SideNav/SideNavMobileMenu';
 import { sideNavData } from '@/components/layout/SideNav/data';
 import { apiRequest } from '@/features/auth/server/api';
 import OverlayLoader from '@/components/ui/OverlayLoader/OverlayLoader';
@@ -67,6 +68,8 @@ async function AppLayout({ children, params }: LayoutProps) {
           <SideNavSections data={sideNavData} />
           <SideNavFooter user={{ firstName, lastName, plan }} />
         </SideNav>
+
+        <SideNavMobileMenu user={{ firstName, lastName, plan }} />
 
         <div className={mainClass}>
           <AuthErrorBoundary>

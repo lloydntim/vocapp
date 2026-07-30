@@ -1,7 +1,12 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
-const appSidebarClass =
-  'w-[260px] flex-0-0-[260px] text-(--text-light) py-5 px-3.5 flex flex-col gap-1 sticky top-0 h-screen bg-(--surface) border-r border-(--border)';
+const appSidebarClass = cn(
+  'hidden md:flex flex-col gap-1 shrink-0',
+  'py-5 md:w-[84px] md:px-2 lg:w-[260px] lg:px-3.5',
+  'text-(--text) sticky top-0 h-screen overflow-y-auto',
+  'bg-(--surface) border-r border-(--border)',
+);
 
 export default function SideNav({ children }: React.PropsWithChildren) {
   return <aside className={appSidebarClass}>{children}</aside>;

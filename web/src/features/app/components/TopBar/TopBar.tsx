@@ -1,6 +1,9 @@
+'use client';
+
 import Headline from '@/components/ui/Headline/Headline';
 import IconButton from '@/components/ui/IconButton/IconButton';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher/ThemeSwitcher';
+import { useMobileNavStore } from '@/components/layout/SideNav/mobile-nav-store';
 
 const topbarClass =
   'h-16 px-7 flex items-center gap-4 bg-(--surface) border-b border-(--border) sticky top-0 z-30 py-2';
@@ -17,13 +20,16 @@ interface TopBarProps {
 }
 
 function TopBar({ path, title }: TopBarProps) {
+  const openMobileNav = useMobileNavStore((state) => state.open);
+
   return (
     <header className={topbarClass}>
       <IconButton
         icon="menu"
         variant="ghost"
         title="Toggle menu"
-        className="sm:block md:hidden"
+        className="md:hidden"
+        onClick={openMobileNav}
       />
       <div className={titleWrapClass}>
         <div className={titleCrumbClass}>{path || 'Dashboard'}</div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const sideNavSectionTitleClass =
-  'uppercase tracking-[0.14em] text-white/45 p-[18px_12px_6px] text-[11px]';
+  'hidden lg:block uppercase tracking-[0.14em] text-(--text-dim) p-[18px_12px_6px] text-[11px]';
 
 export interface SideNavSectionProps {
   title?: string;
