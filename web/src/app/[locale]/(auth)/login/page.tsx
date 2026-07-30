@@ -82,6 +82,9 @@ function LoginPage() {
               submitButtonHandler={onSubmit}
               isSubmitting={loginMutation.isPending || isRedirecting}
             />
+            <Text size="small" className="text-right mt-2">
+              <Link href="/forgot-password">Forgot password?</Link>
+            </Text>
           </>
         }
         hasDivider
