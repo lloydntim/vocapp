@@ -1,12 +1,9 @@
-import type { ComponentProps, ComponentType } from 'react';
+import type { ComponentProps, ComponentType, ReactNode } from 'react';
 import Checkbox from '@/components/ui/Checkbox/Checkbox';
 import ProgressBar from '@/components/ui/ProgressBar/ProgressBar';
 import { cn } from '@/lib/utils';
 import DataTableRowControls from './DataTableRowControls';
 import LangBadges from '../../Badges/LangBadges';
-import IconButton, {
-  IconButtonProps,
-} from '@/components/ui/IconButton/IconButton';
 import Chip from '@/components/ui/Chip/Chip';
 import Link from '@/components/ui/Link/Link';
 
@@ -17,7 +14,7 @@ const rowListSubtitle = 'text-[11px] text-(--text-dim)';
 interface DataTableCellTextProps {
   title: string | number;
   subtitle?: string;
-  button?: IconButtonProps;
+  button?: ReactNode;
   type: 'primary' | 'secondary';
   to?: string;
 }
@@ -34,20 +31,18 @@ function DataTableCellText({
       'text-(--text-muted)',
       typeof title === 'number' && 'tabular-nums',
     );
-    return <span className={numColClass}>{title}</span>;
+    return (
+      <div className="flex items-center">
+        {button}
+        <span className={numColClass}>{title}</span>
+      </div>
+    );
   }
 
   return to ? (
     <Link className="hover:no-underline" href={to}>
       <div className="flex items-center">
-        {button && (
-          <IconButton
-            variant="ghost"
-            icon={button.icon}
-            title={title as string}
-            onClick={button.onClick}
-          />
-        )}
+        {button}
         <div className="flex flex-col">
           <div className={rowListTitle}>{title}</div>
           {subtitle && <small className={rowListSubtitle}>{subtitle}</small>}
@@ -57,14 +52,7 @@ function DataTableCellText({
   ) : (
     <>
       <div className="flex items-center">
-        {button && (
-          <IconButton
-            variant="ghost"
-            icon={button.icon}
-            title={title as string}
-            onClick={button.onClick}
-          />
-        )}
+        {button}
         <div className="flex flex-col">
           <div className={rowListTitle}>{title}</div>
           {subtitle && <small className={rowListSubtitle}>{subtitle}</small>}

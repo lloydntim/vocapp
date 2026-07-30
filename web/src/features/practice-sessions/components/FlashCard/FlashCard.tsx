@@ -4,8 +4,9 @@ import Button from '@/components/ui/Button/Button';
 import ButtonGroup from '@/components/ui/ButtonGroup/ButtonGroup';
 import Card from '@/components/ui/Card/Card';
 import Icon from '@/components/ui/Icon/Icon';
-import IconButton from '@/components/ui/IconButton/IconButton';
 import InputField from '@/components/ui/InputField/InputField';
+import SoundButton from '@/features/audio/components/SoundButton/SoundButton';
+import { ItemAudioField } from '@/features/audio/schemas';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
@@ -51,6 +52,9 @@ const inputStateMap = {
 };
 
 interface FlashCardProps {
+  listId: string;
+  itemId: string;
+  promptField: ItemAudioField;
   sourceLanguageCode: string;
   targetLanguage: string;
   sourceLanguageValue: string;
@@ -67,6 +71,9 @@ interface FlashCardProps {
   state?: 'neutral' | 'incorrect' | 'correct';
 }
 function FlashCard({
+  listId,
+  itemId,
+  promptField,
   targetLanguage,
   sourceLanguageCode,
   sourceLanguageValue,
@@ -98,11 +105,12 @@ function FlashCard({
       <div className={cardTopClass}>
         <Badge text={sourceLanguageCode} />
         <span>{`Translate to ${targetLanguage}`}</span>
-        <IconButton
+        <SoundButton
           className="ml-auto"
-          size="small"
-          variant="ghost"
-          icon="volume-1"
+          size="large"
+          listId={listId}
+          itemId={itemId}
+          field={promptField}
           title="Listen"
         />
       </div>

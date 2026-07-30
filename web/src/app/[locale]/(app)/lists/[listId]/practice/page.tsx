@@ -85,6 +85,10 @@ function PracticeSession({ listId }: { listId: string }) {
   const sourceText = currentItem?.sourceText ?? '';
   const targetText = currentItem?.targetText ?? '';
   const itemId = currentItem?.id ?? '';
+  // The practice direction is togglable (see toggleTranslate), so the
+  // "prompt" shown on the card isn't always the item's source text.
+  const promptField =
+    session.translate.from === sourceLanguageCode ? 'source' : 'target';
 
   const [startedAt, setStartedAt] = useState(() => Date.now());
   const [feedbackState, setFeedbackState] = useState<
@@ -290,6 +294,9 @@ function PracticeSession({ listId }: { listId: string }) {
           <SkeletonPanel />
         ) : (
           <FlashCard
+            listId={listId}
+            itemId={itemId}
+            promptField={promptField}
             targetLanguage={names.of(session.translate.to) as string}
             sourceLanguageCode={session.translate.from}
             sourceLanguageValue={sourceText}

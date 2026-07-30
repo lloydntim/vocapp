@@ -3,6 +3,7 @@ import { VocabListItem } from './types';
 import type { DataTableRowItem } from '@/features/app/components/DataTablePanel/DataTable/types';
 import { CreateListItemFormValues, createListItemSchema } from './schemas';
 import { FieldValues } from 'react-hook-form';
+import SoundButton from '@/features/audio/components/SoundButton/SoundButton';
 
 const FORM_ID = 'create-list-item-form';
 
@@ -22,7 +23,10 @@ export const modalProps = {
   },
 };
 
-export const buildListItemTableRows = (listData: VocabListItem[]) =>
+export const buildListItemTableRows = (
+  listData: VocabListItem[],
+  listId: string,
+) =>
   listData.map((row) => ({
     id: row.id,
     cells: [
@@ -31,7 +35,16 @@ export const buildListItemTableRows = (listData: VocabListItem[]) =>
         props: {
           type: 'primary',
           title: row.sourceText,
-          button: { icon: 'volume-1', title: 'Play audio', onClick: () => {} },
+          button: (
+            <SoundButton
+              listId={listId}
+              itemId={row.id}
+              size="base"
+              className="mr-3"
+              field="source"
+              title="Play source audio"
+            />
+          ),
         },
       },
       {
@@ -39,6 +52,16 @@ export const buildListItemTableRows = (listData: VocabListItem[]) =>
         props: {
           type: 'secondary',
           title: row.targetText,
+          button: (
+            <SoundButton
+              listId={listId}
+              itemId={row.id}
+              size="base"
+              className="mr-3"
+              field="target"
+              title="Play target audio"
+            />
+          ),
         },
       },
       {
