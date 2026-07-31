@@ -1,7 +1,6 @@
 import Headline from '@/components/ui/Headline/Headline';
 import IconButton from '@/components/ui/IconButton/IconButton';
-import RadioButtonGroup from '@/components/ui/RadioButtonGroup/RadioButtonGroup';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 const practiceHeaderClass = 'flex items-center gap-3.5';
 

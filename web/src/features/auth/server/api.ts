@@ -2,10 +2,18 @@ import { UpstreamError } from '@/lib/bff';
 import 'server-only';
 
 const DEFAULT_TIMEOUT_MS = 8000;
-const API_URL = process.env.API_URL;
+
+function getApiUrl(): string {
+  const value = process.env.API_URL;
+
+  if (!value) {
+    throw new Error('API_URL is not configrued');
+  }
+  return value.includes('://') ? value : `http://${value}`;
+}
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
-  const url = `${API_URL}${path}`;
+  const url = `${getApiUrl}${path}`;
 
   try {
     // await is required here: without it, a rejected fetch() promise would

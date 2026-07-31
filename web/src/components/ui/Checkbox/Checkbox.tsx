@@ -3,7 +3,6 @@ import React, {
   InputHTMLAttributes,
   ReactNode,
   forwardRef,
-  useState,
 } from 'react';
 import Icon from '../Icon/Icon';
 import { cn } from '@/lib/utils';

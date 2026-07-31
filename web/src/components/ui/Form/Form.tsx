@@ -134,7 +134,7 @@ function AutoCompleteField<
   // type includes `ref` — react-hook-form's ControllerRenderProps shape, not
   // an actual ref access. The React Compiler isn't enabled in this project
   // (see next.config.ts), so this is a lint-only false positive.
-  /* eslint-disable react-hooks/refs */
+   
   return (
     <AutoComplete
       {...rest}
@@ -150,7 +150,7 @@ function AutoCompleteField<
       }}
     />
   );
-  /* eslint-enable react-hooks/refs */
+   
 }
 
 export type InputDataItem<T extends FieldValues> = {
@@ -217,7 +217,7 @@ function Form<T extends FieldValues, TOutput extends FieldValues = T>({
     trigger,
     setValue,
     getValues,
-    watch,
+    subscribe,
     reset,
     formState: { errors },
   } = useForm<T, unknown, TOutput>({
@@ -234,9 +234,11 @@ function Form<T extends FieldValues, TOutput extends FieldValues = T>({
   useEffect(() => {
     if (!onValuesChange) return;
 
-    const subscription = watch((values) => onValuesChange(values));
-    return () => subscription.unsubscribe();
-  }, [watch, onValuesChange]);
+    return subscribe({
+      formState: { values: true },
+      callback: ({ values: nextValues }) => onValuesChange(nextValues),
+    });
+  }, [subscribe, onValuesChange]);
 
   return (
     <form
