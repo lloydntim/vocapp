@@ -136,7 +136,7 @@ export const buildCreateListFormProps = (
 export const buildTableData = (data: VocabList[] | undefined) => ({
   columns: listColumnConfigData,
   rows: buildListTableRows(data),
-  isSelectable: true,
+  isSelectable: false,
   controls: [],
 });
 
