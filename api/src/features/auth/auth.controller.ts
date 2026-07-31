@@ -7,8 +7,7 @@ import logger from '../../config/logger.js';
 import { BadRequestError } from '../../errors/BadRequestError.js';
 
 import { UnauthorizedError } from '../../errors/UnauthorizedError.js';
-import EmailService from '../../shared/email/email.service.js';
-import { NodeMailerProvider } from '../../shared/email/nodemailer.provider.js';
+import emailService from '../../shared/email/email.factory.js';
 import {
   loginUser,
   logoutUser,
@@ -39,8 +38,6 @@ interface AuthResponse {
   data?: UserResponseData;
   message?: string;
 }
-
-const emailService = new EmailService(new NodeMailerProvider());
 
 const REFRESH_TOKEN_COOKIE_OPTIONS = {
   httpOnly: true,
