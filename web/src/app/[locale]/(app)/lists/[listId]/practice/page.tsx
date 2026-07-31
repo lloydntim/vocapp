@@ -208,6 +208,7 @@ function PracticeSession({ listId }: { listId: string }) {
 
   useEffect(() => {
     startPracticeSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div
