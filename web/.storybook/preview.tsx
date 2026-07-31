@@ -1,6 +1,7 @@
 import type { Preview } from '@storybook/nextjs-vite';
 
 import { withThemeByClassName } from '@storybook/addon-themes';
+import { NextIntlClientProvider } from 'next-intl';
 
 import '../src/app/global.css';
 
@@ -28,6 +29,14 @@ const preview: Preview = {
       },
       defaultTheme: 'light',
     }),
+    (Story) => (
+      // Components using next-intl's Link/useRouter (e.g. our Link, and
+      // anything built on it like DataTablePanel) need this context —
+      // there's no real Next.js request in Storybook to infer it from.
+      <NextIntlClientProvider locale="en">
+        <Story />
+      </NextIntlClientProvider>
+    ),
   ],
 };
 
