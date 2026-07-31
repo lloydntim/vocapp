@@ -4,10 +4,16 @@ import { DataTableRowItem, RowControl } from './types';
 interface DataTableBodyProps {
   rows: DataTableRowItem[];
   isSelectable: boolean;
+  isSelectDisabled?: boolean;
   controls: RowControl[];
 }
 
-function DataTableBody({ rows, isSelectable, controls }: DataTableBodyProps) {
+function DataTableBody({
+  rows,
+  isSelectable,
+  isSelectDisabled,
+  controls,
+}: DataTableBodyProps) {
   return (
     <tbody>
       {rows.map(({ id, cells }: DataTableRowItem) => (
@@ -16,6 +22,7 @@ function DataTableBody({ rows, isSelectable, controls }: DataTableBodyProps) {
           id={id}
           data={cells}
           isSelectable={isSelectable}
+          isSelectDisabled={isSelectDisabled}
           controls={controls}
         />
       ))}

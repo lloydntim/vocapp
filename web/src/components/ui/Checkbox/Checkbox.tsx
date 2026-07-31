@@ -28,14 +28,19 @@ interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
-  { id, checked = false, label, error, onChange, ...rest },
+  { id, checked = false, label, error, onChange, disabled, ...rest },
   ref,
 ) {
   const errorId = `${id}-error`;
   const hasError = Boolean(error);
   return (
     <>
-      <label className={checkboxRowClass}>
+      <label
+        className={cn(
+          checkboxRowClass,
+          disabled && 'cursor-not-allowed opacity-50',
+        )}
+      >
         <input
           ref={ref}
           className="hidden"
@@ -43,9 +48,16 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
           type="checkbox"
           checked={checked}
           onChange={onChange}
+          disabled={disabled}
           {...rest}
         />
-        <span className={cn(checkboxClass, checked && checkboxActiveClass)}>
+        <span
+          className={cn(
+            checkboxClass,
+            checked && checkboxActiveClass,
+            disabled && 'cursor-not-allowed',
+          )}
+        >
           {checked && <Icon size={CHECK_ICON_SIZE} type="check" />}
         </span>
         {label && <span>{label}</span>}

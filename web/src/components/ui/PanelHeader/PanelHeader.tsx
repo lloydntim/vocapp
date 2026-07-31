@@ -3,9 +3,10 @@ import Headline from '@/components/ui/Headline/Headline';
 import { cn } from '@/lib/utils';
 
 const panelHeaderClass =
-  'p-[18px_22px] flex items-center gap-[14px] border-b border-(--border) bg-(--surface)';
-const panelHeadlineClass = 'text-[18px] font-bold tracking-[-0.01em] m-0';
-const panelToolbarClass = 'ml-auto flex gap-[10px] items-center';
+  'p-[18px_22px] flex flex-wrap items-center gap-[14px] border-b border-(--border) bg-(--surface)';
+const panelHeadlineClass = 'text-[18px] font-bold tracking-[-0.01em] m-0 shrink-0';
+const panelToolbarClass =
+  'ml-auto flex flex-wrap gap-[10px] items-center w-full sm:w-auto';
 const panelTextSmallClass = 'text-[12px] text-(--text-dim) tracking-[0.04em]';
 
 interface PanelHeaderProps {

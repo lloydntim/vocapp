@@ -13,7 +13,8 @@ import { ContentHeader } from '@/features/app/layouts/Content/ContentHeader';
 import LangBadges from '@/features/app/components/Badges/LangBadges';
 import Button from '@/components/ui/Button/Button';
 import { itemColumnConfigData } from '@/features/vocab-items/columns';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import OverlayLoader from '@/components/ui/OverlayLoader/OverlayLoader';
 import VocabListSummaryBar from '@/features/vocab-lists/components/VocabListSummaryBar/VocabListSummaryBar';
 import FormModal from '@/features/app/components/FormModal/FormModal';
@@ -86,14 +87,39 @@ interface ListItemsSectionProps {
   onAddButtonClick: () => void;
 }
 
+const statusFilterOptions = [
+  { value: '', label: 'All' },
+  { value: 'LEARNING', label: 'Learning' },
+  { value: 'MASTERED', label: 'Mastered' },
+];
+
 function ListItemsSection({
   listId,
   onEditButtonClick,
   onDeleteButtonClick,
   onAddButtonClick,
 }: ListItemsSectionProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeStatus = searchParams.get('status') ?? '';
+
   const listItemQuery = useGetListItems(listId);
   const listItems = listItemQuery.data;
+  const filteredItems = activeStatus
+    ? listItems.filter((item) => item.status === activeStatus)
+    : listItems;
+
+  const handleStatusFilterChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set('status', value);
+    } else {
+      params.delete('status');
+    }
+    const query = params.toString();
+    router.push(`${pathname}${query ? `?${query}` : ''}`);
+  };
 
   const handleEditItem = (id: string) => {
     const item = listItems.find((listItem) => listItem.id === id);
@@ -107,8 +133,9 @@ function ListItemsSection({
 
   const tableProps = {
     columns: itemColumnConfigData,
-    rows: buildListItemTableRows(listItems, listId),
+    rows: buildListItemTableRows(filteredItems, listId),
     isSelectable: true,
+    isSelectDisabled: true,
     controls: [
       {
         icon: 'square-pen',
@@ -141,16 +168,19 @@ function ListItemsSection({
         ],
       }}
       headerProps={{
-        title: 'All lists',
-        smallText: '10 of 10',
+        title: 'All words',
+        smallText: `${filteredItems.length} of ${listItems.length}`,
         showAddButton: true,
         showSearch: true,
-        showLanguageFilter: true,
+        showLanguageFilter: false,
+        showStatusFilter: true,
         addButtonLabel: 'New word/phrase',
-        searchPlaceholder: 'Search lists',
+        searchPlaceholder: 'Search words',
         searchInputChangeHandler: () => {},
         addButtonClickHandler: onAddButtonClick,
-        languageFilterClickHandler: () => {},
+        statusFilterValue: activeStatus,
+        statusFilterOptions,
+        statusFilterClickHandler: handleStatusFilterChange,
       }}
       tableProps={tableProps}
     />

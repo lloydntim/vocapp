@@ -7,9 +7,15 @@ import PanelHeader from '@/components/ui/PanelHeader/PanelHeader';
 import InputField from '@/components/ui/InputField/InputField';
 import Button from '@/components/ui/Button/Button';
 import Select from '@/components/ui/Select/Select';
+import RadioButtonGroup from '@/components/ui/RadioButtonGroup/RadioButtonGroup';
 import Card from '@/components/ui/Card/Card';
 
 interface LanguageFilterOption {
+  value: string;
+  label: string;
+}
+
+interface StatusFilterOption {
   value: string;
   label: string;
 }
@@ -22,6 +28,7 @@ interface DataTablePanelHeaderProps {
   showAddButton?: boolean;
   showSearch?: boolean;
   showLanguageFilter?: boolean;
+  showStatusFilter?: boolean;
   title?: string;
   smallText?: string;
   resultCount?: number;
@@ -32,9 +39,12 @@ interface DataTablePanelHeaderProps {
   searchId?: string;
   languageFilterValue?: string;
   languageFilterOptions?: LanguageFilterOption[];
+  statusFilterValue?: string;
+  statusFilterOptions?: StatusFilterOption[];
   searchInputChangeHandler?(event: ChangeEvent<HTMLInputElement>): void;
   addButtonClickHandler?(event: MouseEvent<HTMLButtonElement>): void;
   languageFilterClickHandler?(value: string): void;
+  statusFilterClickHandler?(value: string): void;
 }
 
 interface DataTablePanelProps {
@@ -51,6 +61,7 @@ function DataTablePanel({
     showAddButton = true,
     showSearch = true,
     showLanguageFilter = true,
+    showStatusFilter = false,
     title = 'All lists',
     smallText = '',
     searchPlaceholder = '',
@@ -60,6 +71,9 @@ function DataTablePanel({
     languageFilterValue = '',
     languageFilterOptions = defaultLanguageFilterOptions,
     languageFilterClickHandler = undefined,
+    statusFilterValue = '',
+    statusFilterOptions = [],
+    statusFilterClickHandler = undefined,
   },
   tableProps,
   emptyViewProps,
@@ -71,13 +85,12 @@ function DataTablePanel({
   const toolbar = (
     <>
       {showSearch && (
-        <div className="relative flex-1" style={{ minWidth: '240px' }}>
+        <div className="relative flex-1 min-w-[160px]">
           <InputField
             icon="search"
             type="text"
             size="small"
-            placeholder="Search lists…"
-            value={searchPlaceholder}
+            placeholder={searchPlaceholder}
             id={searchId}
             onChange={searchInputChangeHandler}
           />
@@ -93,6 +106,18 @@ function DataTablePanel({
             onValueChange={languageFilterClickHandler}
           />
         )}
+        {showStatusFilter && (
+          <RadioButtonGroup
+            value={statusFilterValue}
+            changeHandler={statusFilterClickHandler}
+            radios={statusFilterOptions.map(({ value, label }) => ({
+              id: `status-filter-${value || 'all'}`,
+              name: 'status-filter',
+              value,
+              label,
+            }))}
+          />
+        )}
       </div>
 
       {showAddButton && (
@@ -102,7 +127,7 @@ function DataTablePanel({
           icon="plus"
           onClick={addButtonClickHandler}
         >
-          {addButtonLabel}
+          <span className="hidden sm:inline">{addButtonLabel}</span>
         </Button>
       )}
     </>

@@ -1,4 +1,4 @@
-import React, { ComponentProps, useState } from 'react';
+import React, { ComponentProps, useEffect, useState } from 'react';
 import RadioButton from '../RadioButton/RadioButton';
 
 const radioButtonGroupClass =
@@ -6,13 +6,18 @@ const radioButtonGroupClass =
 
 interface RadioButtonGroupProps {
   radios: ComponentProps<typeof RadioButton>[];
+  value?: string;
   changeHandler?: (value: string) => void;
 }
 
-function RadioButtonGroup({ radios, changeHandler }: RadioButtonGroupProps) {
+function RadioButtonGroup({ radios, value, changeHandler }: RadioButtonGroupProps) {
   const [selectedValue, setSelectedValue] = useState<string | null>(
-    radios[0]?.value as string | null,
+    value ?? (radios[0]?.value as string | null),
   );
+
+  useEffect(() => {
+    if (value !== undefined) setSelectedValue(value);
+  }, [value]);
 
   return (
     <div role="radiogroup" className={radioButtonGroupClass}>

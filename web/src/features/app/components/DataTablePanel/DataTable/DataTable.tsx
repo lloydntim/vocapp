@@ -6,6 +6,7 @@ export interface DataTableProps {
   columns: DataTableColumnItem[];
   rows: DataTableRowItem[];
   isSelectable: boolean;
+  isSelectDisabled?: boolean;
   controls: RowControl[];
 }
 

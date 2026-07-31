@@ -10,6 +10,7 @@ interface DataTableRowProps {
   id: string;
   data: DataTableCellProps[];
   isSelectable: boolean;
+  isSelectDisabled?: boolean;
   controls?: RowControl[];
 }
 
@@ -18,6 +19,7 @@ export default function DataTableRow({
   data,
   controls,
   isSelectable,
+  isSelectDisabled,
 }: DataTableRowProps) {
   return (
     <tr className={dataTableRowClass}>
@@ -25,7 +27,7 @@ export default function DataTableRow({
         <DataTableCell
           type="checkbox"
           className={dataTableCellClass}
-          props={{ checked: false, onChange: () => {} }}
+          props={{ checked: false, onChange: () => {}, disabled: isSelectDisabled }}
         />
       )}
       {data.map((cell, index) => (
