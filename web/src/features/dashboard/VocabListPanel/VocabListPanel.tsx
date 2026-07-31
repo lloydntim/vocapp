@@ -1,3 +1,6 @@
+'use client';
+
+import { MouseEvent } from 'react';
 import Button from '@/components/ui/Button/Button';
 import Icon from '@/components/ui/Icon/Icon';
 import ProgressBar from '@/components/ui/ProgressBar/ProgressBar';
@@ -6,6 +9,7 @@ import PanelEmptyView, {
   PanelEmptyViewProps,
 } from '@/components/ui/PanelEmptyView/PanelEmptyView';
 import PanelHeader from '@/components/ui/PanelHeader/PanelHeader';
+import { useRouter } from '@/i18n/navigation';
 
 const panelClass =
   'bg-(--surface) border border-(--border) rounded-(--radius-lg) shadow-(--shadow-sm) overflow-hidden';
@@ -26,29 +30,45 @@ export interface VocabListPanelRowProps {
   title: string;
   subtitle: string;
   // mastered: number;
-  // total: number;
+  total: number;
   // lastPracticed: string;
   progress: number;
   buttonLabel?: string;
   buttonIcon?: string;
-  buttonClickHandler?(): void;
 }
 
 function VocabListPanelRow({
+  id,
   sourceLang,
   targetLang,
   title,
   subtitle,
   // mastered,
-  // total,
+  total,
   // lastPracticed,
   progress,
   buttonLabel,
   buttonIcon = 'play',
-  buttonClickHandler,
 }: VocabListPanelRowProps) {
+  const router = useRouter();
+
+  const goToList = () => router.push(`/lists/${id}`);
+
+  const goToPractice = (event: MouseEvent) => {
+    event.stopPropagation();
+    router.push(`/lists/${id}/practice`);
+  };
+
   return (
-    <div className={panelRowClass}>
+    <div
+      className={panelRowClass}
+      role="link"
+      tabIndex={0}
+      onClick={goToList}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') goToList();
+      }}
+    >
       <LangBadges sourceLang={sourceLang} targetLang={targetLang} />
 
       <div className={panelRowListInfo}>
@@ -58,16 +78,18 @@ function VocabListPanelRow({
 
       <ProgressBar progress={progress} className="hidden sm:flex" />
 
-      <Button
-        rank="primary"
-        icon={buttonIcon}
-        size="small"
-        title={buttonLabel}
-        ariaLabel={buttonLabel}
-        onClick={buttonClickHandler}
-      >
-        <span className="hidden sm:inline">{buttonLabel}</span>
-      </Button>
+      {total > 0 && (
+        <Button
+          rank="primary"
+          icon={buttonIcon}
+          size="small"
+          title={buttonLabel}
+          ariaLabel={buttonLabel}
+          onClick={goToPractice}
+        >
+          <span className="hidden sm:inline">{buttonLabel}</span>
+        </Button>
+      )}
     </div>
   );
 }
@@ -101,8 +123,8 @@ function VocabListPanel({
       <PanelHeader title={title} toolbar={toolbar} />
 
       <div className={panelContentClass}>
-        {data.map((row, index) => (
-          <VocabListPanelRow key={index} {...row} />
+        {data.map((row) => (
+          <VocabListPanelRow key={row.id} {...row} />
         ))}
       </div>
     </div>

@@ -92,7 +92,6 @@ export const buildFormFields = (
 
 export const buildVocabListPanelData = (
   data: VocabList[] | undefined,
-  clickHandler?: () => void,
 ): VocabListPanelRowProps[] =>
   (data ?? []).map((row) => ({
     id: row.id,
@@ -100,11 +99,11 @@ export const buildVocabListPanelData = (
     targetLang: row.targetLanguageCode,
     title: row.name,
     subtitle: `${row.mastered || 0} / ${row.total || 0} mastered · ${row.lastPracticed ? `last ${timeAgo(row.lastPracticed)} ago` : 'Never'}`,
+    total: row.total || 0,
     progress: row.total
       ? Math.round(((row.mastered || 0) / row.total) * 100)
       : 0,
     buttonLabel: 'Practice',
-    buttonClickHandler: clickHandler,
   }));
 
 export const modalProps = {
