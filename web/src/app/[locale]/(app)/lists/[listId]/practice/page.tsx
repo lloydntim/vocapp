@@ -21,6 +21,10 @@ import PracticeHeader from '@/features/practice-sessions/components/PracticeHead
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { practiceSessionStorageKey } from '@/features/practice-sessions/helpers';
 import { PracticeSessionState } from '@/features/practice-sessions/types';
+import {
+  PracticeSessionAction,
+  practiceSessionReducer,
+} from '@/features/practice-sessions/reducer';
 import { useAddPracticeResults } from '@/features/practice-results/hooks';
 import {
   useEndPracticeSession,
@@ -102,6 +106,10 @@ function PracticeSession({ listId }: { listId: string }) {
     type: 'language',
   });
 
+  const dispatch = (action: PracticeSessionAction) => {
+    setSession((prev) => practiceSessionReducer(prev, action));
+  };
+
   const startPracticeSession = () => {
     const payload = {
       startedAt: new Date().toISOString(),
@@ -119,33 +127,19 @@ function PracticeSession({ listId }: { listId: string }) {
 
   const toggleTranslate = (value: string) => {
     const [from, to] = value.split('-');
-    const source =
-      session.translate.source === sourceText ? targetText : sourceText;
-    const target =
-      session.translate.target === targetText ? sourceText : targetText;
-    setSession((prev) => ({
-      ...prev,
-      translate: { from, to, source, target },
-    }));
+    dispatch({ type: 'TOGGLE_TRANSLATE', from, to, sourceText, targetText });
   };
 
-  const advanceToNextWord = (patch: Partial<PracticeSessionState> = {}) => {
-    const nextIndex = Math.min(items.length, session.currentWordIndex + 1);
-    const isComplete = nextIndex >= items.length;
-    const now = Date.now();
-
-    setSession((prev) => ({
-      ...prev,
-      ...patch,
-      currentWordIndex: nextIndex,
-      inputValue: '',
-      sessionCompletedAt: isComplete ? now : prev.sessionCompletedAt,
-    }));
-    setStartedAt(now);
+  const advanceToNextWord = (
+    action: Extract<PracticeSessionAction, { type: 'ADVANCE' | 'SKIP' }>,
+  ) => {
+    const nextState = practiceSessionReducer(session, action);
+    setSession(nextState);
+    setStartedAt(action.now);
     setFeedbackState('neutral');
 
-    if (isComplete) {
-      const payload = session.practiceResults.map((result) => {
+    if (nextState.sessionCompletedAt !== null) {
+      const payload = nextState.practiceResults.map((result) => {
         return {
           ...result,
           startedAt: new Date(result.startedAt).toISOString(),
@@ -156,10 +150,10 @@ function PracticeSession({ listId }: { listId: string }) {
         onSuccess: () => {
           endSessionMutation.mutate(
             {
-              completedAt: new Date(Date.now()).toISOString(),
-              totalErrors: session.errors,
-              totalHints: session.hints,
-              totalSkipped: session.skipped,
+              completedAt: new Date(action.now).toISOString(),
+              totalErrors: nextState.errors,
+              totalHints: nextState.hints,
+              totalSkipped: nextState.skipped,
             },
             {
               onSuccess: ({ data }) => {
@@ -179,17 +173,9 @@ function PracticeSession({ listId }: { listId: string }) {
   };
 
   const handleRestart = () => {
-    setSession((prev) => ({
-      ...prev,
-      currentWordIndex: 0,
-      hints: 0,
-      errors: 0,
-      skipped: 0,
-      practiceResults: [],
-      sessionStartedAt: Date.now(),
-      sessionCompletedAt: null,
-    }));
-    setStartedAt(Date.now());
+    const now = Date.now();
+    dispatch({ type: 'RESTART', now });
+    setStartedAt(now);
     setFeedbackState('neutral');
   };
 
@@ -201,49 +187,23 @@ function PracticeSession({ listId }: { listId: string }) {
   const handleSkip = () => {
     if (session.currentWordIndex >= items.length) return;
 
-    const skippedCount = session.skipped + 1;
     advanceToNextWord({
-      skipped: skippedCount,
-      practiceResults: [
-        ...session.practiceResults,
-        {
-          sourceText,
-          targetText,
-          startedAt,
-          sessionId,
-          completedAt: Date.now(),
-          hints: session.hints,
-          errors: session.errors,
-          skipped: true,
-          itemId,
-        },
-      ],
+      type: 'SKIP',
+      totalItems: items.length,
+      context: { sourceText, targetText, itemId, sessionId, startedAt },
+      now: Date.now(),
     });
   };
 
   const handleSubmit = () => {
     const isCorrect = session.inputValue.trim() === targetText;
     setFeedbackState(isCorrect ? 'correct' : 'incorrect');
-    setSession((prev) => ({
-      ...prev,
-      errors: isCorrect ? prev.errors : prev.errors + 1,
-      practiceResults: isCorrect
-        ? [
-            ...prev.practiceResults,
-            {
-              sourceText,
-              targetText,
-              startedAt,
-              sessionId,
-              completedAt: Date.now(),
-              hints: prev.hints,
-              errors: prev.errors,
-              skipped: false,
-              itemId,
-            },
-          ]
-        : prev.practiceResults,
-    }));
+    dispatch({
+      type: 'SUBMIT_ANSWER',
+      isCorrect,
+      context: { sourceText, targetText, itemId, sessionId, startedAt },
+      now: Date.now(),
+    });
   };
 
   useEffect(() => {
@@ -301,18 +261,22 @@ function PracticeSession({ listId }: { listId: string }) {
             sourceLanguageCode={session.translate.from}
             sourceLanguageValue={sourceText}
             targetLanguageValue={targetText}
-            onReveal={() => {
-              setSession((prev) => ({ ...prev, hints: prev.hints + 1 }));
-            }}
+            onReveal={() => dispatch({ type: 'REVEAL_HINT' })}
             onSkip={handleSkip}
             onRestart={handleRestart}
             inputValue={session.inputValue}
-            onInputChange={(value) => {
-              setSession((prev) => ({ ...prev, inputValue: value }));
-            }}
+            onInputChange={(value) =>
+              dispatch({ type: 'SET_INPUT', value })
+            }
             loading={startSessionMutation.isPending}
             onSubmit={handleSubmit}
-            onNext={() => advanceToNextWord()}
+            onNext={() =>
+              advanceToNextWord({
+                type: 'ADVANCE',
+                totalItems: items.length,
+                now: Date.now(),
+              })
+            }
             state={feedbackState}
           />
         )}
