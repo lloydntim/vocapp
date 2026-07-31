@@ -1,12 +1,9 @@
 import { BadRequestError } from '../../../../errors/BadRequestError.js';
-import { PracticeResult } from '../../../../generated/prisma/client.js';
+import type { PracticeResult } from '../../../../generated/prisma/client.js';
 import itemRepository from '../../items/item.repository.js';
 import sessionRepository from '../session.repository.js';
 import resultRepository from './result.repository.js';
 import type { AddResultInput } from './result.schema.js';
-
-type CreateResultInput = Pick<PracticeResult, 'sourceText' | 'targetText' | 'startedAt'> &
-  Partial<Pick<PracticeResult, 'itemId' | 'completedAt' | 'hints' | 'errors' | 'skipped'>>;
 
 async function getResultsByUserListSession(
   userId: string,

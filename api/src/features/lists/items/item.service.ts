@@ -1,5 +1,5 @@
 import logger from '../../../config/logger.js';
-import { VocabularyListItem } from '../../../generated/prisma/client.js';
+import type { VocabularyListItem } from '../../../generated/prisma/client.js';
 import listRepository from '../list.repository.js';
 import listItemRepository from './item.repository.js';
 import type { AddItemInput } from './item.schema.js';

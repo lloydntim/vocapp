@@ -1,5 +1,5 @@
 import prisma from '../../../db/client.js';
-import { VocabularyListItem } from '../../../generated/prisma/client.js';
+import type { VocabularyListItem } from '../../../generated/prisma/client.js';
 import { handlePrismaError } from '../../../utils/handlePrismaError.js';
 
 type UpdateVocabListItemInput = Pick<VocabularyListItem, 'position' | 'sourceText' | 'targetText'>;

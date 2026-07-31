@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import listItemRepository from '../lists/items/item.repository.js';
 import listRepository from '../lists/list.repository.js';
 import type { GetItemAudioQuery } from './audio.schema.js';

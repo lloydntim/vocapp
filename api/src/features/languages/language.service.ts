@@ -1,4 +1,5 @@
-import { TranslationServiceClient, protos } from '@google-cloud/translate';
+import type { protos } from '@google-cloud/translate';
+import { TranslationServiceClient } from '@google-cloud/translate';
 import env from '../../config/env.js';
 import logger from '../../config/logger.js';
 import { BadRequestError } from '../../errors/BadRequestError.js';

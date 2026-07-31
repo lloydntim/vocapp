@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import logger from '../../../config/logger.js';
-import { VocabularyListItem } from '../../../generated/prisma/client.js';
+import type { VocabularyListItem } from '../../../generated/prisma/client.js';
 import listItemRepository from './item.repository.js';
 import listItemService from './item.service.js';
 

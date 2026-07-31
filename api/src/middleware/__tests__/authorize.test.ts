@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ForbiddenError } from '../../errors/ForbiddenError.js';
 import { UnauthorizedError } from '../../errors/UnauthorizedError.js';

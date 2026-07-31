@@ -1,5 +1,5 @@
 import prisma from '../../../db/client.js';
-import { PracticeSession } from '../../../generated/prisma/client.js';
+import type { PracticeSession } from '../../../generated/prisma/client.js';
 import { handlePrismaError } from '../../../utils/handlePrismaError.js';
 
 type CreateSessionInput = Pick<PracticeSession, 'startedAt' | 'idempotencyKey'>;

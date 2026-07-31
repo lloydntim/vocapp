@@ -310,7 +310,7 @@ describe('authService', () => {
 
     it('throws UnauthorizedError when the user linked to the token does not exist', async () => {
       vi.mocked(tokenRepository.findTokenByHash).mockResolvedValue(validToken);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(userRepository.findUserById).mockRejectedValueOnce(new NotFoundError('not found'));
 
       await expect(resetUserPassword({ token: 'raw-token', password: 'new-pass' })).rejects.toThrow(
@@ -364,7 +364,7 @@ describe('authService', () => {
 
     it('throws UnauthorizedError when the user linked to the token does not exist', async () => {
       vi.mocked(tokenRepository.findTokenByHash).mockResolvedValue(validToken);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(userRepository.findUserById).mockRejectedValueOnce(new NotFoundError('not found'));
 
       await expect(verifyUser('raw-token')).rejects.toThrow(UnauthorizedError);

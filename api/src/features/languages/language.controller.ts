@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { NoParams } from '../../shared/types/index.js';
+import type { NoParams } from '../../shared/types/index.js';
 import languageService from './language.service.js';
 
 export interface TranslationResponse {

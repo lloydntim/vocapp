@@ -1,6 +1,6 @@
 import logger from '../../config/logger.js';
 import prisma from '../../db/client.js';
-import { RefreshToken } from '../../generated/prisma/client.js';
+import type { RefreshToken } from '../../generated/prisma/client.js';
 import { handlePrismaError } from '../../utils/handlePrismaError.js';
 
 type RefreshTokenInput = Pick<RefreshToken, 'userId' | 'tokenHash' | 'expiresAt'>;

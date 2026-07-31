@@ -1,5 +1,5 @@
 import prisma from '../../../../db/client.js';
-import { PracticeResult, Prisma } from '../../../../generated/prisma/client.js';
+import type { PracticeResult, Prisma } from '../../../../generated/prisma/client.js';
 import { handlePrismaError } from '../../../../utils/handlePrismaError.js';
 
 type CreateResultInput = Omit<PracticeResult, 'createdAt'>;

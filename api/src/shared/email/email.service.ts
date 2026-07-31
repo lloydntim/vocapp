@@ -3,7 +3,7 @@ import {
   verifcationEmailTemplate,
   welcomeEmailTemplate,
 } from './email.templates.js';
-import {
+import type {
   EmailProvider,
   ResetPasswordEmailInput,
   verificationEmailInput,

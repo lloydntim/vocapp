@@ -1,6 +1,6 @@
 import { BadRequestError } from '../../../errors/BadRequestError.js';
 import { ConflictError } from '../../../errors/ConflictError.js';
-import { PracticeSession } from '../../../generated/prisma/client.js';
+import type { PracticeSession } from '../../../generated/prisma/client.js';
 import redisClient from '../../../redis/client.js';
 import sessionRepository from './session.repository.js';
 

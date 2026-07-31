@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import logger from '../../../config/logger.js';
-import { PracticeSession } from '../../../generated/prisma/client.js';
+import type { PracticeSession } from '../../../generated/prisma/client.js';
 import sessionService from './session.service.js';
 
 type SessionResponse = {

@@ -1,5 +1,5 @@
 import prisma from '../../db/client.js';
-import { VocabularyList } from '../../generated/prisma/client.js';
+import type { VocabularyList } from '../../generated/prisma/client.js';
 import { handlePrismaError } from '../../utils/handlePrismaError.js';
 
 type UpdateVocabListInput = {

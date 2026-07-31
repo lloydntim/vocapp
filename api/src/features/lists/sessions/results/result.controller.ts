@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import logger from '../../../../config/logger.js';
-import { PracticeResult } from '../../../../generated/prisma/client.js';
+import type { PracticeResult } from '../../../../generated/prisma/client.js';
 import resultService from './result.service.js';
 
 type ResultResponse = {

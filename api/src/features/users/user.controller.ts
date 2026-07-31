@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import logger from '../../config/logger.js';
 import { NotFoundError } from '../../errors/NotFoundError.js';
 import type { User } from '../../generated/prisma/client.js';
-import { NoParams } from '../../shared/types/index.js';
+import type { NoParams } from '../../shared/types/index.js';
 import userRepository from './user.repository.js';
 import userService from './user.service.js';
 
@@ -11,7 +11,7 @@ interface UserResponse {
   message?: string;
 }
 
-async function getUsers(req: Request<NoParams, UserResponse>, res: Response<UserResponse>) {
+async function getUsers(_: Request<NoParams, UserResponse>, res: Response<UserResponse>) {
   const users = await userRepository.findUsers();
 
   if (!users) {
@@ -56,7 +56,7 @@ export async function updateUser(req: Request<{ userId: string }>, res: Response
   });
 }
 
-export async function deleteUser(req: Request<{ userId: string }>, res: Response<{}>) {
+export async function deleteUser(req: Request<{ userId: string }>, res: Response<object>) {
   await userService.deleteUser(req.params.userId);
 
   logger.info({ listId: req.params.userId }, 'User Account has been deleted successfully');
