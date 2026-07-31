@@ -1,9 +1,17 @@
 import type { NextFunction, Request, Response } from 'express';
-import { ZodError, ZodSchema } from 'zod';
+import type { ZodType } from 'zod';
+import { ZodError } from 'zod';
 import logger from '../config/logger.js';
 import { BadRequestError } from '../errors/BadRequestError.js';
 
-function validate(schema: ZodSchema) {
+interface ValidatedRequestParts {
+  body?: unknown;
+  params?: unknown;
+  query?: unknown;
+  headers?: unknown;
+}
+
+function validate<T extends ValidatedRequestParts>(schema: ZodType<T>) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       const parsed = schema.parse({
@@ -16,7 +24,7 @@ function validate(schema: ZodSchema) {
       // req.query is a getter-only accessor in Express 5, so it can't be
       // reassigned here; body/params are plain properties and safe to update.
       if (parsed.body !== undefined) req.body = parsed.body;
-      if (parsed.params !== undefined) req.params = parsed.params;
+      if (parsed.params !== undefined) req.params = parsed.params as typeof req.params;
 
       next();
     } catch (error: unknown) {
