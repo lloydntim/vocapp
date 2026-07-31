@@ -102,6 +102,11 @@ router.get(
  *       500:
  *         description: Translation service is currently unavailable
  */
-router.post('/', authenticate, validate(getTranslationsSchema), languageController.getTranslations);
+router.post(
+  '/translation',
+  authenticate,
+  validate(getTranslationsSchema),
+  languageController.getTranslations,
+);
 
 export default router;

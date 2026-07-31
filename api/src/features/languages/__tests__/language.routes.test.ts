@@ -84,14 +84,13 @@ describe('LANGUAGE ROUTES', () => {
 
     it('returns 200 with the translations on success', async () => {
       vi.mocked(languageService.getTranslations).mockResolvedValueOnce({
-        translations: [{ translatedText: 'Elle a une voiture', detectedLanguageCode: 'en' }],
+        translatedText: 'Elle a une voiture',
       });
 
       const response = await request(app).post('/api/v1/languages/translation').send(validPayload);
 
       expect(response.status).toEqual(200);
-      expect(response.body.data.translations).toHaveLength(1);
-      expect(response.body.data.translations[0].translatedText).toEqual('Elle a une voiture');
+      expect(response.body.data.translatedText).toEqual('Elle a une voiture');
     });
 
     it('returns 400 when the phrase could not be translated', async () => {
