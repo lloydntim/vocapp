@@ -134,8 +134,7 @@ function ListItemsSection({
   const tableProps = {
     columns: itemColumnConfigData,
     rows: buildListItemTableRows(filteredItems, listId),
-    isSelectable: true,
-    isSelectDisabled: true,
+    isSelectable: false,
     controls: [
       {
         icon: 'square-pen',
