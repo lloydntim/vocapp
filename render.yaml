@@ -1,18 +1,19 @@
 services:
   - type: keyvalue
     name: vocapp-redis
-    plan: starter
+    plan: free
     region: frankfurt
     ipAllowList: []
     maxmemoryPolicy: allkeys-lru
     persistenceMode: 'off'
 
-  - type: pserv
+  - type: web
     name: vocapp-api
     runtime: node
-    plan: starter
+    plan: free
     region: frankfurt
     autoDeployTrigger: checksPass
+    healthCheckPath: /health
 
     buildCommand: >-
       corepack enable &&
@@ -93,7 +94,7 @@ services:
   - type: web
     name: vocapp-web
     runtime: node
-    plan: starter
+    plan: free
     region: frankfurt
     autoDeployTrigger: checksPass
     healthCheckPath: /api/health
@@ -119,13 +120,14 @@ services:
 
       - key: API_URL
         fromService:
-          type: pserv
+          type: web
           name: vocapp-api
-          property: hostport
+          envVarKey: RENDER_EXTERNAL_URL
 
 databases:
   - name: vocapp-postgres
-    plan: basic-1gb
+    plan: basic-256mb
+    diskSizeGB: 1
     region: frankfurt
     postgresMajorVersion: '16'
     databaseName: vocapp
