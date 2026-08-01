@@ -67,7 +67,7 @@ export default function Button({
   onTouchEnd,
   type = 'button',
   isLink = false,
-  target = '_blank',
+  target = '_self',
   rel = 'noopener',
   loading = false,
   form,
