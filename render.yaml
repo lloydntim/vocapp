@@ -1,0 +1,135 @@
+services:
+  - type: keyvalue
+    name: vocapp-redis
+    plan: starter
+    region: frankfurt
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+    persistenceMode: 'off'
+
+  - type: pserv
+    name: vocapp-api
+    runtime: node
+    plan: starter
+    region: frankfurt
+    autoDeployTrigger: checksPass
+
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm --filter @vocapp/api db:generate &&
+      pnpm --filter @vocapp/api build
+
+    preDeployCommand: >-
+      pnpm --filter @vocapp/api exec prisma migrate deploy
+
+    startCommand: pnpm --filter @vocapp/api start
+
+    buildFilter:
+      paths:
+        - api/**
+        - package.json
+        - pnpm-lock.yaml
+        - pnpm-workspace.yaml
+        - .node-version
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: PORT
+        value: 10000
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vocapp-postgres
+          property: connectionString
+
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: vocapp-redis
+          property: connectionString
+
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+
+      - key: CLIENT_URL
+        sync: false
+
+      - key: EMAIL_FROM
+        sync: false
+
+      - key: RESEND_API_KEY
+        sync: false
+
+      - key: SMTP_SECURE
+        value: 'false'
+
+      - key: GCS_PROJECT_ID
+        sync: false
+
+      - key: GCS_CLIENT_EMAIL
+        sync: false
+
+      - key: GCS_PRIVATE_KEY
+        sync: false
+
+      - key: GCS_PROJECT_LOCATION
+        sync: false
+
+      - key: AWS_REGION
+        sync: false
+
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+      - key: AWS_BUCKET_NAME
+        sync: false
+
+  - type: web
+    name: vocapp-web
+    runtime: node
+    plan: starter
+    region: frankfurt
+    autoDeployTrigger: checksPass
+    healthCheckPath: /api/health
+
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm --filter @vocapp/web build
+
+    startCommand: pnpm --filter @vocapp/web start
+
+    buildFilter:
+      paths:
+        - web/**
+        - package.json
+        - pnpm-lock.yaml
+        - pnpm-workspace.yaml
+        - .node-version
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: API_URL
+        fromService:
+          type: pserv
+          name: vocapp-api
+          property: hostport
+
+databases:
+  - name: vocapp-postgres
+    plan: basic-1gb
+    region: frankfurt
+    postgresMajorVersion: '16'
+    databaseName: vocapp
+    user: vocapp
+    ipAllowList: []
+    connectionPool: none
+    storageAutoscalingEnabled: false

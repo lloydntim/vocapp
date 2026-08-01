@@ -1,6 +1,6 @@
 import logger from '../../config/logger.js';
 import prisma from '../../db/client.js';
-import { Token, TokenPurpose } from '../../generated/prisma/client.js';
+import type { Token, TokenPurpose } from '../../generated/prisma/client.js';
 import { handlePrismaError } from '../../utils/handlePrismaError.js';
 
 type TokenInput = Pick<Token, 'userId' | 'tokenHash' | 'purpose' | 'expiresAt'>;

@@ -1,4 +1,4 @@
-import { VocabularyList } from '../../generated/prisma/client.js';
+import type { VocabularyList } from '../../generated/prisma/client.js';
 import listRepository from './list.repository.js';
 
 type VocabListInput = {

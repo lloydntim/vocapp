@@ -1,5 +1,5 @@
 import prisma from '../../../../db/client.js';
-import { PracticeResult } from '../../../../generated/prisma/client.js';
+import type { PracticeResult, Prisma } from '../../../../generated/prisma/client.js';
 import { handlePrismaError } from '../../../../utils/handlePrismaError.js';
 
 type CreateResultInput = Omit<PracticeResult, 'createdAt'>;
@@ -20,8 +20,15 @@ async function addResult(input: CreateResultInput): Promise<PracticeResult> {
   });
 }
 
+async function addResults(input: Prisma.PracticeResultCreateManyInput[]): Promise<void> {
+  await handlePrismaError(prisma.practiceResult.createMany({ data: input, skipDuplicates: true }), {
+    P2002: 'Practice Result could not be created',
+  });
+}
+
 export default {
   findResultsBySessionId,
   findResultBySessionId,
   addResult,
+  addResults,
 };

@@ -1,4 +1,4 @@
-import { User } from '../../generated/prisma/client.js';
+import type { User } from '../../generated/prisma/client.js';
 import userRepository from './user.repository.js';
 
 async function getUsers(): Promise<User[]> {

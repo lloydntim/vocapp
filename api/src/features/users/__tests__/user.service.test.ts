@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { User } from '../../../generated/prisma/client.js';
+import type { User } from '../../../generated/prisma/client.js';
 import userRepository from '../user.repository.js';
 import userService from '../user.service.js';
 

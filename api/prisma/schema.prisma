@@ -26,6 +26,11 @@ enum UserPlan {
   FREE
 }
 
+enum VocabularyItemStatus {
+  LEARNING
+  MASTERED
+}
+
 model User {
   id String  @id @default(uuid()) @db.Uuid
   firstName  String   @map("first_name")
@@ -118,6 +123,8 @@ model VocabularyList {
   sourceLanguageCode String  @map("source_language_code")
   targetLanguageCode String  @map("target_language_code")
   name             String
+  lastPracticed    DateTime? @map("last_practiced")
+
   deletedAt        DateTime? @map("deleted_at")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
@@ -145,6 +152,8 @@ model VocabularyListItem {
   sourceText String   @map("source_text")
   targetText String   @map("target_text")
 
+  status VocabularyItemStatus @default(LEARNING)
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -171,6 +180,8 @@ model PracticeResult {
   session PracticeSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   item    VocabularyListItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
 
+  @@unique([sessionId, itemId, startedAt])
+
   @@index([sessionId])
   @@index([itemId])
 
@@ -185,13 +196,17 @@ model PracticeSession {
   completedAt DateTime? @map("completed_at")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
+  idempotencyKey String   @map("idempotency_key") @db.Uuid
   totalHints Int   @default(0)
   totalErrors Int   @default(0)
   totalSkipped Int   @default(0)
 
+  results PracticeResult[]
+
   user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   list    VocabularyList @relation(fields: [listId], references: [id], onDelete: Cascade)
-  results PracticeResult[]
+
+  @@unique([idempotencyKey])
 
   @@map("practice_sessions")
 }

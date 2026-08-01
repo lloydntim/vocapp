@@ -7,7 +7,8 @@ vi.mock('argon2', () => ({
 
 vi.mock('../../users/user.repository.js', () => ({
   default: {
-    findUserByEmailOrUsername: vi.fn(),
+    findUserByLoginIdentifier: vi.fn(),
+    findConflictingUser: vi.fn(),
     findUserById: vi.fn(),
     addUser: vi.fn(),
     updateUser: vi.fn(),
@@ -44,6 +45,10 @@ vi.mock('../../../config/logger.js', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock('../../../redis/client.js', () => ({
+  default: { get: vi.fn(), set: vi.fn() },
+}));
+
 import { hash, verify } from 'argon2';
 import { BadRequestError } from '../../../errors/BadRequestError.js';
 import { ConflictError } from '../../../errors/ConflictError.js';
@@ -60,6 +65,7 @@ import {
   rotateRefreshToken,
   verifyUser,
 } from '../auth.service.js';
+import redisClient from '../../../redis/client.js';
 import refreshTokenRepository from '../refreshToken.repository.js';
 import tokenRepository from '../token.repository.js';
 import tokenService from '../token.service.js';
@@ -118,7 +124,7 @@ beforeEach(() => {
 describe('authService', () => {
   describe('registerUser', () => {
     it('returns userData and a success message', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(null);
+      vi.mocked(userRepository.findConflictingUser).mockResolvedValue(null);
       vi.mocked(userRepository.addUser).mockResolvedValue(mockUser);
 
       const result = await registerUser(registerInput);
@@ -127,7 +133,7 @@ describe('authService', () => {
     });
 
     it('creates a verification token linked to the new user', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(null);
+      vi.mocked(userRepository.findConflictingUser).mockResolvedValue(null);
       vi.mocked(userRepository.addUser).mockResolvedValue(mockUser);
 
       await registerUser(registerInput);
@@ -139,7 +145,7 @@ describe('authService', () => {
     });
 
     it('throws ConflictError when username already exists', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(mockUserWithCredential);
+      vi.mocked(userRepository.findConflictingUser).mockResolvedValue(mockUserWithCredential);
 
       await expect(registerUser(registerInput)).rejects.toThrow(ConflictError);
     });
@@ -147,7 +153,7 @@ describe('authService', () => {
 
   describe('loginUser', () => {
     it('returns accessToken, refreshToken and userData on valid credentials', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(mockUserWithCredential);
+      vi.mocked(userRepository.findUserByLoginIdentifier).mockResolvedValue(mockUserWithCredential);
       vi.mocked(refreshTokenRepository.createRefreshToken).mockResolvedValue(mockRefreshToken);
 
       const result = await loginUser({ username: 'jdoe', password: 'plain-password' });
@@ -159,7 +165,7 @@ describe('authService', () => {
     });
 
     it('throws UnauthorizedError when the user does not exist', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(null);
+      vi.mocked(userRepository.findUserByLoginIdentifier).mockResolvedValue(null);
 
       await expect(loginUser({ username: 'unknown', password: 'pass' })).rejects.toThrow(
         UnauthorizedError,
@@ -167,7 +173,7 @@ describe('authService', () => {
     });
 
     it('throws UnauthorizedError when the password does not match', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(mockUserWithCredential);
+      vi.mocked(userRepository.findUserByLoginIdentifier).mockResolvedValue(mockUserWithCredential);
       vi.mocked(verify).mockResolvedValue(false);
 
       await expect(loginUser({ username: 'jdoe', password: 'wrong-pass' })).rejects.toThrow(
@@ -232,6 +238,7 @@ describe('authService', () => {
         ...mockRefreshToken,
         revokedAt: new Date(),
       });
+      vi.mocked(redisClient.get).mockResolvedValue(null);
 
       await expect(rotateRefreshToken('reused-token')).rejects.toThrow(UnauthorizedError);
     });
@@ -239,7 +246,7 @@ describe('authService', () => {
 
   describe('requestPasswordReset', () => {
     it('returns a raw reset token when the user exists', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(mockUserWithCredential);
+      vi.mocked(userRepository.findUserByLoginIdentifier).mockResolvedValue(mockUserWithCredential);
 
       const result = await requestPasswordReset({ email: mockUser.email });
 
@@ -250,7 +257,7 @@ describe('authService', () => {
     });
 
     it('throws BadRequestError when the email is not registered', async () => {
-      vi.mocked(userRepository.findUserByEmailOrUsername).mockResolvedValue(null);
+      vi.mocked(userRepository.findUserByLoginIdentifier).mockResolvedValue(null);
 
       await expect(requestPasswordReset({ email: 'unknown@example.com' })).rejects.toThrow(
         BadRequestError,
@@ -303,7 +310,7 @@ describe('authService', () => {
 
     it('throws UnauthorizedError when the user linked to the token does not exist', async () => {
       vi.mocked(tokenRepository.findTokenByHash).mockResolvedValue(validToken);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(userRepository.findUserById).mockRejectedValueOnce(new NotFoundError('not found'));
 
       await expect(resetUserPassword({ token: 'raw-token', password: 'new-pass' })).rejects.toThrow(
@@ -357,7 +364,7 @@ describe('authService', () => {
 
     it('throws UnauthorizedError when the user linked to the token does not exist', async () => {
       vi.mocked(tokenRepository.findTokenByHash).mockResolvedValue(validToken);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       vi.mocked(userRepository.findUserById).mockRejectedValueOnce(new NotFoundError('not found'));
 
       await expect(verifyUser('raw-token')).rejects.toThrow(UnauthorizedError);

@@ -1,5 +1,5 @@
 import logger from '../../../config/logger.js';
-import { VocabularyListItem } from '../../../generated/prisma/client.js';
+import type { VocabularyListItem } from '../../../generated/prisma/client.js';
 import listRepository from '../list.repository.js';
 import listItemRepository from './item.repository.js';
 import type { AddItemInput } from './item.schema.js';
@@ -53,6 +53,22 @@ async function addVocabListItem(
   });
 }
 
+async function updateVocabListItemStatus(
+  userId: string,
+  listId: string,
+  listItemId: string,
+  status: 'LEARNING' | 'MASTERED',
+): Promise<VocabularyListItem> {
+  const vocabList = await listRepository.findVocabListByUser(listId, userId);
+  const vocabListItem = await listItemRepository.findVocabListItemByListId(
+    listItemId,
+    vocabList.id,
+  );
+  logger.info({ listId, userId, listItemId, status }, 'Updated list item status');
+
+  return listItemRepository.updateVocabListItemStatus(vocabListItem.id, status);
+}
+
 async function deleteVocabListItem(id: string) {
   await listItemRepository.deleteVocabListItem(id);
 }
@@ -62,5 +78,6 @@ export default {
   getVocabListItemsByUserList,
   getVocabListItemByUserList,
   addVocabListItem,
+  updateVocabListItemStatus,
   deleteVocabListItem,
 };

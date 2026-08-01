@@ -24,10 +24,14 @@ export const userListParamsSchema = z.object({
   params: userListParams,
 });
 
-export const userListItemParamsSchema = paramsSchema({
+export const userListItemParams = z.object({
   userId: uuidParam(),
   listId: uuidParam(),
   itemId: uuidParam(),
+});
+
+export const userListItemParamsSchema = z.object({
+  params: userListItemParams,
 });
 
 export const userListSessionParamsSchema = paramsSchema({
@@ -47,6 +51,7 @@ export const createUserSchema = z.object({
       .max(30)
       .regex(/^[a-z0-9_-]+$/, 'Only lowercase letters, numbers, hyphens and underscores'),
     password: z.string().min(8).max(128),
+    locale: z.string().optional(),
   }),
 });
 

@@ -1,0 +1,216 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: light;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --teal-50: #e6f1f0;
+  --teal-100: #c5dedc;
+  --teal-200: #8ec0bd;
+  --teal-300: #4f9b97;
+  --teal-400: #1f7a75;
+  --teal-500: #0b5d5d;
+  --teal-600: #074a4a;
+  --teal-700: #053838;
+  --teal-800: #032828;
+  --bg: #f4f6f7;
+  --surface: #ffffff;
+  --surface-2: #fafbfc;
+  --surface-alt: #f1f4f5;
+  --border: #e4e8ea;
+  --border-strong: #cdd4d7;
+  --text: #0e1a1a;
+  --text-muted: #5a6b6d;
+  --text-dim: #8a9a9c;
+  --brand: var(--teal-500);
+  --brand-hover: var(--teal-600);
+  --brand-soft: var(--teal-50);
+  --brand-ink: #ffffff;
+  --success: #2f9e6b;
+  --success-soft: #e4f5ec;
+  --danger: #c44545;
+  --danger-soft: #fbe9e9;
+  --warn: #c08a2e;
+  --warn-soft: #faf1dc;
+  --shadow-sm: 0 1px 2px rgba(7, 30, 30, 0.04), 0 1px 1px rgba(7, 30, 30, 0.03);
+  --shadow-md:
+    0 6px 16px -8px rgba(7, 30, 30, 0.12), 0 2px 4px rgba(7, 30, 30, 0.04);
+  --shadow-lg:
+    0 24px 48px -18px rgba(7, 30, 30, 0.22), 0 6px 14px rgba(7, 30, 30, 0.06);
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur: 220ms;
+  --dur-slow: 420ms;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #0b1414;
+  --surface: #111d1d;
+  --surface-2: #162424;
+  --surface-alt: #1b2a2a;
+  --border: #233434;
+  --border-strong: #2f4343;
+  --text: #eaf1f0;
+  --text-muted: #93a5a6;
+  --text-dim: #657677;
+  --brand: #2c9a94;
+  --brand-hover: #39ada6;
+  --brand-soft: #10322f;
+  --brand-ink: #06181a;
+  --success: #3bb884;
+  --success-soft: #113527;
+  --danger: #e26565;
+  --danger-soft: #3a1a1a;
+  --warn: #d5a24a;
+  --warn-soft: #332816;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md:
+    0 8px 24px -12px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-lg:
+    0 28px 60px -20px rgba(0, 0, 0, 0.7), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes hero-mock-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0.5deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.5deg);
+  }
+}
+
+@keyframes hero-mock-float-2 {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes reveal-up {
+  0% {
+    transform: translateY(18px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes flip-in {
+  0% {
+    opacity: 0;
+    transform: rotateX(-8deg) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0) translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes confirm-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes confirm-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes form-banner-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-6px);
+  }
+  30% {
+    transform: translateX(5px);
+  }
+  45% {
+    transform: translateX(-4px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes skel-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.reveal-animation {
+  animation-delay: var(--delay);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
+  line-height: 1.5;
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}

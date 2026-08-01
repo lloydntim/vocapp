@@ -10,7 +10,7 @@ async function findUsers(): Promise<User[]> {
   return prisma.user.findMany();
 }
 
-async function findUserByEmailOrUsername(identifier: string): Promise<UserWithCredential | null> {
+async function findUserByLoginIdentifier(identifier: string): Promise<UserWithCredential | null> {
   const normalizedIdentifier = identifier.trim().toLowerCase();
 
   if (!normalizedIdentifier) {
@@ -20,6 +20,25 @@ async function findUserByEmailOrUsername(identifier: string): Promise<UserWithCr
   return prisma.user.findFirst({
     where: {
       OR: [{ email: normalizedIdentifier }, { username: normalizedIdentifier }],
+    },
+    include: { credential: true },
+  });
+}
+
+async function findConflictingUser(
+  username: string,
+  email: string,
+): Promise<UserWithCredential | null> {
+  const normalizedUsername = username.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedUsername || !normalizedEmail) {
+    return null;
+  }
+
+  return prisma.user.findFirst({
+    where: {
+      OR: [{ username: normalizedUsername }, { email: normalizedEmail }],
     },
     include: { credential: true },
   });
@@ -39,6 +58,8 @@ async function addUser(
     prisma.user.create({
       data: {
         ...data,
+        email: data.email.trim().toLowerCase(),
+        username: data.username.trim().toLowerCase(),
         credential: { create: { passwordHash } },
       },
     }),
@@ -74,7 +95,8 @@ async function updateCredential(userId: string, passwordHash: string): Promise<C
 
 export default {
   findUsers,
-  findUserByEmailOrUsername,
+  findUserByLoginIdentifier,
+  findConflictingUser,
   findUserById,
   addUser,
   updateUser,

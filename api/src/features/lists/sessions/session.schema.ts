@@ -15,13 +15,16 @@ export const getSessionSchema = z.object({
 
 export const startSessionSchema = z.object({
   params: sessionParams,
+  headers: z.object({
+    'idempotency-key': z.string().uuid(),
+  }),
   body: z.object({
     startedAt: z.coerce.date(),
   }),
 });
 
 export const endSessionSchema = z.object({
-  params: sessionParams.extend({ id: z.string().uuid() }),
+  params: sessionParams.extend({ sessionId: z.string().uuid() }),
   body: z.object({
     completedAt: z.coerce.date(),
     totalHints: z.number().int().min(0),

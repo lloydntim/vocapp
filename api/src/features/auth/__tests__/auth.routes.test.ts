@@ -9,6 +9,7 @@ import {
   registerUser,
   requestPasswordReset,
   resetUserPassword,
+  rotateRefreshToken,
   verifyUser,
 } from '../auth.service.js';
 
@@ -161,6 +162,29 @@ describe('AUTH ROUTES', () => {
       );
 
       const response = await request(app).post('/api/v1/auth/verify').send({ token: 'expired-token' });
+
+      expect(response.status).toEqual(401);
+    });
+  });
+
+  describe('POST /auth/refresh', () => {
+    it('returns the rotated refresh token in the response body, not just the cookie', async () => {
+      vi.mocked(rotateRefreshToken).mockResolvedValue({
+        newAccessToken: 'new-access-token',
+        newRefreshToken: 'new-refresh-token',
+      });
+
+      const response = await request(app)
+        .post('/api/v1/auth/refresh')
+        .set('Cookie', ['refreshToken=old-refresh-token']);
+
+      expect(response.status).toEqual(200);
+      expect(response.body.accessToken).toEqual('new-access-token');
+      expect(response.body.refreshToken).toEqual('new-refresh-token');
+    });
+
+    it('returns 401 when no refresh token cookie is present', async () => {
+      const response = await request(app).post('/api/v1/auth/refresh');
 
       expect(response.status).toEqual(401);
     });

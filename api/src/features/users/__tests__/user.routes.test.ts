@@ -121,6 +121,7 @@ describe('USER ROUTES', () => {
       targetLanguageId: null,
       sourceLanguageCode: 'en',
       targetLanguageCode: 'fr',
+      lastPracticed: null,
       deletedAt: null,
       createdAt: new Date(),
       updatedAt: new Date(),

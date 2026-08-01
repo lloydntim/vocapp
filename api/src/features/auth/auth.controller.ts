@@ -7,8 +7,7 @@ import logger from '../../config/logger.js';
 import { BadRequestError } from '../../errors/BadRequestError.js';
 
 import { UnauthorizedError } from '../../errors/UnauthorizedError.js';
-import EmailService from '../../shared/email/email.service.js';
-import { NodeMailerProvider } from '../../shared/email/nodemailer.provider.js';
+import emailService from '../../shared/email/email.factory.js';
 import {
   loginUser,
   logoutUser,
@@ -35,11 +34,10 @@ type AuthRequest<P = NoParams, ResBody = AuthResponse, ReqBody = unknown> = Omit
 
 interface AuthResponse {
   accessToken?: string;
+  refreshToken?: string;
   data?: UserResponseData;
   message?: string;
 }
-
-const emailService = new EmailService(new NodeMailerProvider());
 
 const REFRESH_TOKEN_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -52,7 +50,7 @@ const REFRESH_TOKEN_COOKIE_OPTIONS = {
 const REFRESH_TOKEN_CLEAR_OPTIONS = {
   httpOnly: true,
   secure: env.NODE_ENV === 'production',
-  sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  sameSite: env.NODE_ENV === 'production' ? ('strict' as const) : ('lax' as const),
   path: '/api/v1/auth',
 };
 
@@ -60,8 +58,9 @@ async function register(
   req: Request<NoParams, AuthResponse, CreateUserInput>,
   res: Response<AuthResponse>,
 ) {
-  const { verificationToken, userData } = await registerUser(req.body);
-  const verificationUrl = `${env.CLIENT_URL}/verify?token=${verificationToken}`;
+  const { locale, ...userEntries } = req.body;
+  const { verificationToken, userData } = await registerUser(userEntries);
+  const verificationUrl = `${env.CLIENT_URL}/${locale}/verify/confirm?token=${verificationToken}`;
 
   emailService.sendVerificationEmail({
     to: userData.email,
@@ -91,6 +90,7 @@ async function login(
     message: 'User is logged in',
     data: userData,
     accessToken,
+    refreshToken,
   });
 }
 
@@ -148,7 +148,7 @@ async function resetPassword(
 
   const user = await resetUserPassword({ token, password });
 
-  res.cookie('refreshToken', '');
+  res.clearCookie('refreshToken', REFRESH_TOKEN_CLEAR_OPTIONS);
 
   logger.info({ userId: user.id }, `Password for user has been updated.`);
   res.status(200).json({
@@ -168,8 +168,7 @@ async function refresh(req: AuthRequest<NoParams, AuthResponse>, res: Response<A
   // set cookie with new refresh token
   res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
-  // return access token
-  res.status(200).json({ accessToken: newAccessToken });
+  res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
 }
 
 async function verify(req: Request, res: Response<AuthResponse>) {
@@ -184,7 +183,12 @@ async function verify(req: Request, res: Response<AuthResponse>) {
   res.cookie('refreshToken', newRefreshToken, REFRESH_TOKEN_COOKIE_OPTIONS);
 
   logger.info({ userId }, 'User has been verified');
-  res.status(200).json({ accessToken: newAccessToken, message: 'User has been verified' });
+
+  res.status(200).json({
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+    message: 'User has been verified',
+  });
 }
 
 export default { register, login, logout, forgotPassword, resetPassword, refresh, verify };

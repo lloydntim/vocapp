@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      NODE_ENV: test
+      API_URL: http://127.0.0.1:3000
+      CLIENT_URL: http://127.0.0.1:3001
+
+      DATABASE_URL: postgresql://vocapp:${{ github.run_id }}@127.0.0.1:5432/vocapp
+      REDIS_URL: redis://127.0.0.1:6379
+
+      JWT_ACCESS_SECRET: ci-only-secret-that-is-at-least-32-characters
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: '1025'
+      SMTP_SECURE: 'false'
+      EMAIL_FROM: ci@example.com
+
+      GCS_PROJECT_ID: ci-project
+      GCS_CLIENT_EMAIL: ci@example.com
+      GCS_PRIVATE_KEY: 'ci-private-key-value-that-is-longer-than-thirty-two-characters'
+      GCS_PROJECT_LOCATION: global
+
+      AWS_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: ci-access-key
+      AWS_SECRET_ACCESS_KEY: ci-secret-key
+      AWS_BUCKET_NAME: ci-bucket
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: vocapp
+          POSTGRES_PASSWORD: ${{ github.run_id }}
+          POSTGRES_DB: vocapp
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vocapp -d vocapp"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @vocapp/api db:generate
+
+      - name: Apply test database migrations
+        run: pnpm --filter @vocapp/api exec prisma migrate deploy
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck web
+        run: pnpm --filter @vocapp/web typecheck
+
+      - name: Test API
+        run: pnpm --filter @vocapp/api test
+
+      - name: Test web
+        run: pnpm --filter @vocapp/web test:unit
+
+      - name: Build API
+        run: pnpm --filter @vocapp/api build
+
+      - name: Build web
+        run: pnpm --filter @vocapp/web build

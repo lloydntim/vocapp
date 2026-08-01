@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
-import { RateLimiterLike, RateLimiterRes } from 'rate-limiter-flexible';
+import type { RateLimiterLike} from 'rate-limiter-flexible';
+import { RateLimiterRes } from 'rate-limiter-flexible';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TooManyRequestsError } from '../../errors/TooManyRequestsError.js';
 import { createRateLimitMiddleware } from '../rateLimit.js';

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import logger from '../../config/logger.js';
-import { VocabularyList } from '../../generated/prisma/client.js';
-import { NoParams } from '../../shared/types/index.js';
+import type { VocabularyList } from '../../generated/prisma/client.js';
+import type { NoParams } from '../../shared/types/index.js';
 import listService from './list.service.js';
 
 export interface VocabListResponse {

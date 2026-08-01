@@ -38,3 +38,6 @@ coverage/
 # Claude
 CLAUDE.md
 **/CLAUDE.md
+
+# Personal reference docs (not project documentation)
+docs/

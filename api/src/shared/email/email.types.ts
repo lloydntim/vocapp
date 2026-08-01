@@ -1,4 +1,4 @@
-import { User } from '../../generated/prisma/client.js';
+import type { User } from '../../generated/prisma/client.js';
 
 export type SendEmailInput = {
   to: string;
