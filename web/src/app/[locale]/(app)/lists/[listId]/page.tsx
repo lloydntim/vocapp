@@ -252,12 +252,15 @@ function VocabListPage() {
     deleteDialogRef.current?.showModal();
   };
 
+  const closeItemModal = () => {
+    dialogRef.current?.close();
+    setEditingItem(null);
+    setItemFormValues({});
+  };
+
   const addItemHandler = (data: CreateListItemPayload) => {
     createItemMutation.mutate(data, {
-      onSuccess: () => {
-        dialogRef.current?.close();
-        setEditingItem(null);
-      },
+      onSuccess: closeItemModal,
     });
   };
 
@@ -273,10 +276,7 @@ function VocabListPage() {
   const editItemHandler = (data: CreateListItemPayload) => {
     const payload = { status: data.status };
     updateItemMutation.mutate(payload, {
-      onSuccess: () => {
-        dialogRef.current?.close();
-        setEditingItem(null);
-      },
+      onSuccess: closeItemModal,
     });
   };
 
@@ -331,10 +331,7 @@ function VocabListPage() {
                 createItemMutation.isPending || updateItemMutation.isPending,
             },
           },
-          onModalClose: () => {
-            dialogRef.current?.close();
-            setEditingItem(null);
-          },
+          onModalClose: closeItemModal,
         }}
       />
       <DeleteModal
