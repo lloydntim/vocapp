@@ -62,7 +62,7 @@ async function register(
   const { verificationToken, userData } = await registerUser(userEntries);
   const verificationUrl = `${env.CLIENT_URL}/${locale}/verify/confirm?token=${verificationToken}`;
 
-  emailService.sendVerificationEmail({
+  await emailService.sendVerificationEmail({
     to: userData.email,
     verificationUrl,
   });
