@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import z from 'zod';
+import { z } from 'zod';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -11,11 +11,11 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_SECURE: z.string(),
-  EMAIL_FROM: z.string().email().default('noreply@vocapp.local'),
+  EMAIL_FROM: z.email().default('noreply@vocapp.local'),
   RESEND_API_KEY: z.string().optional(),
-  CLIENT_URL: z.string().url().default('http://localhost:3001'),
+  CLIENT_URL: z.url().default('http://localhost:3001'),
   GCS_PROJECT_ID: z.string(),
-  GCS_CLIENT_EMAIL: z.string().email(),
+  GCS_CLIENT_EMAIL: z.email(),
   GCS_PRIVATE_KEY: z.string().min(32),
   GCS_PROJECT_LOCATION: z.string(),
   AWS_REGION: z.string(),
