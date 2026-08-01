@@ -113,7 +113,7 @@ function PracticeSection({
               rank="primary"
               size="large"
               isLink
-              to="/app"
+              to="/signup"
             >
               Try a session
             </Button>

@@ -85,7 +85,7 @@ const heroCopyContent = {
   leadText:
     'Create your own lists, drill them with fast flashcards, and watch your mastery climb — across French, Spanish, German, Italian and more.',
   links: [
-    { href: '#', text: 'Start learning free' },
+    { href: '/signup', text: 'Start learning free' },
     { href: '#how', text: 'See how it works' },
   ],
 };
