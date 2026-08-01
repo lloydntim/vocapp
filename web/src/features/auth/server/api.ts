@@ -13,7 +13,7 @@ function getApiUrl(): string {
 }
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
-  const url = `${getApiUrl}${path}`;
+  const url = `${getApiUrl()}${path}`;
 
   try {
     // await is required here: without it, a rejected fetch() promise would
