@@ -11,7 +11,7 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_SECURE: z.string(),
-  EMAIL_FROM: z.email().default('noreply@vocapp.local'),
+  EMAIL_FROM: z.email().default('onboarding@resend.dev'),
   RESEND_API_KEY: z.string().optional(),
   CLIENT_URL: z.url().default('http://localhost:3001'),
   GCS_PROJECT_ID: z.string(),
