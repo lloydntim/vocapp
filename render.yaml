@@ -21,10 +21,9 @@ services:
       pnpm --filter @vocapp/api db:generate &&
       pnpm --filter @vocapp/api build
 
-    preDeployCommand: >-
-      pnpm --filter @vocapp/api exec prisma migrate deploy
-
-    startCommand: pnpm --filter @vocapp/api start
+    startCommand: >-
+      pnpm --filter @vocapp/api exec prisma migrate deploy &&
+      pnpm --filter @vocapp/api start
 
     buildFilter:
       paths:
