@@ -1,7 +1,7 @@
 import { UpstreamError } from '@/lib/bff';
 import 'server-only';
 
-const DEFAULT_TIMEOUT_MS = 8000;
+const DEFAULT_TIMEOUT_MS = 75_000;
 
 function getApiUrl(): string {
   const value = process.env.API_URL;
