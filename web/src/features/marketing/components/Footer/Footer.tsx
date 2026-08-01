@@ -92,7 +92,7 @@ const footerData: FooterProps = {
         { href: '#features', text: 'Features' },
         { href: '#how', text: 'How it works' },
         { href: '#practice', text: 'Practice' },
-        { href: '#', text: 'Open app' },
+        { href: '/login', text: 'Open app' },
       ],
     },
     {

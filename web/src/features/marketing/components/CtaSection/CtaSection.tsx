@@ -23,7 +23,7 @@ export const ctaSectionData = {
       rank: 'primary',
       size: 'large',
       isLink: true,
-      to: 'VocApp Redesign.html',
+      to: '/signup',
       label: 'Open VocApp',
       className:
         'bg-white text-[var(--teal-600)] hover:bg-white/90 border-white hover:border-white/90 shadow-[0_1px_2px_rgba(11,93,93,0.25)]',

@@ -22,7 +22,7 @@ const headerData: HeaderProps = {
   navlinks: navigationData.links,
   navButtons: [
     { type: 'iconButton', icon: 'moon', rank: 'secondary' },
-    { type: 'button', size: 'small', isLink: true, to: '', text: 'Open app' },
+    { type: 'button', size: 'small', isLink: true, to: '/login', text: 'Open app' },
   ],
 };
 
