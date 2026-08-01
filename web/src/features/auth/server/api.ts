@@ -9,7 +9,10 @@ function getApiUrl(): string {
   if (!value) {
     throw new Error('API_URL is not configrued');
   }
-  return value.includes('://') ? value : `http://${value}`;
+  const origin = value.includes('://') ? value : `http://${value}`;
+  const normalized = origin.replace(/\/+$/, '');
+
+  return normalized.endsWith('/api/v1') ? normalized : `${normalized}/api/v1`;
 }
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
