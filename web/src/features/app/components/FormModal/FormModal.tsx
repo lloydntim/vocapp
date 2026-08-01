@@ -22,12 +22,21 @@ function FormModal<T extends FieldValues, TOutput extends FieldValues = T>({
     modalProps.onModalClose?.();
   };
 
+  // The dialog can also close without going through onModalClose — e.g. a
+  // parent calling dialogRef.current?.close() directly after a successful
+  // save. The native `close` event fires either way, so reset the form
+  // there too (idempotent if handleModalClose already reset it).
+  const handleNativeClose = () => {
+    formRef.current?.reset();
+  };
+
   return (
     <Modal
       ref={ref}
       {...{
         ...modalProps,
         onModalClose: handleModalClose,
+        onClose: handleNativeClose,
       }}
     >
       <Form {...formProps} ref={formRef} />
