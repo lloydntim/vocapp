@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "start": "node dist/server.js",
     "test": "vitest --config vitetest.config.ts",
     "lint": "eslint .",
     "db:generate": "prisma generate",
