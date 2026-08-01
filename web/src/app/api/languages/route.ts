@@ -25,7 +25,7 @@ export const POST = withErrorHandling(async (request: Request) => {
   const accessToken = await requireAccessToken();
   const payload = await request.json();
 
-  const apiResponse = await apiRequest('/languages/translations', {
+  const apiResponse = await apiRequest('/languages/translation', {
     method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify(payload),
