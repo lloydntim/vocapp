@@ -11,8 +11,18 @@ const animationClass =
   'w-[72px] h-[72px] rounded-full mx-auto mb-[14px] bg-[var(--brand)] text-[var(--brand-ink)] grid place-items-center shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--brand)_55%,transparent)] animate-[rise_380ms_var(--ease)]';
 
 const starIconContainerClass = 'inline-flex gap-1.5 mb-2.5';
+const starFilledClass = 'text-(--brand)';
+const starEmptyClass = 'text-(--text-dim)';
 const CHECK_ICON_SIZE = 32;
 const STAR_ICON_SIZE = 22;
+const STAR_COUNT = 3;
+
+function getEarnedStars(accuracy: number) {
+  if (accuracy >= 90) return 3;
+  if (accuracy >= 70) return 2;
+  if (accuracy >= 40) return 1;
+  return 0;
+}
 
 const headlineClass = 'mt-1 mb-1.5 text-[26px] font-bold tracking-[-0.01em]';
 const subheadlineClass =
@@ -89,6 +99,8 @@ function PracticeResultPanels({
       ? Math.round((totalTimeMs / totalPhrases / 1000) * 10) / 10
       : 0;
 
+  const earnedStars = getEarnedStars(accuracy);
+
   const totalSeconds = Math.max(0, Math.round(totalTimeMs / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -124,22 +136,19 @@ function PracticeResultPanels({
           </div>
 
           <div className={starIconContainerClass}>
-            <Icon
-              type="star"
-              size={STAR_ICON_SIZE}
-              style={{ transitionDelay: '0ms' }}
-            />
-            <Icon
-              type="star"
-              size={STAR_ICON_SIZE}
-              style={{ transitionDelay: '200ms' }}
-            />
-            <Icon
-              type="star"
-              size={STAR_ICON_SIZE}
-              style={{ transitionDelay: '400ms' }}
-              fill="none"
-            />
+            {Array.from({ length: STAR_COUNT }, (_, index) => {
+              const filled = index < earnedStars;
+              return (
+                <Icon
+                  key={index}
+                  type="star"
+                  size={STAR_ICON_SIZE}
+                  className={filled ? starFilledClass : starEmptyClass}
+                  fill={filled ? 'currentColor' : 'none'}
+                  style={{ transitionDelay: `${index * 200}ms` }}
+                />
+              );
+            })}
           </div>
         </div>
 
