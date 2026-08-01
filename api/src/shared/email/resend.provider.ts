@@ -12,12 +12,16 @@ export class ResendEmailProvider implements EmailProvider {
   }
 
   async send(input: SendEmailInput): Promise<void> {
-    await this.resend.emails.send({
+    const { error } = await this.resend.emails.send({
       from: this.fromEmail,
       to: input.to,
       subject: input.subject,
       text: input.text,
       html: input.html,
     });
+
+    if (error) {
+      throw new Error(`Resend failed: ${error.message}`);
+    }
   }
 }
