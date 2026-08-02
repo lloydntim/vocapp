@@ -80,7 +80,7 @@ function Footer({ columns, branding, bottom }: FooterProps) {
 const footerData: FooterProps = {
   branding: (
     <>
-      <Logo />
+      <Logo href="/" />
       <p>
         The clean, focused way to learn and remember vocabulary in any language.
       </p>

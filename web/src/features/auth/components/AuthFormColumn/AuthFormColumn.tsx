@@ -18,7 +18,7 @@ function AuthFormColumn({ authHeaderLink, children }: AuthFormColumnProps) {
   return (
     <div className={authPageColumnClass}>
       <div className={authTopClass}>
-        <Logo />
+        <Logo href="/" />
         <div className={authTopRightClass}>
           <IconButton title="Toggle theme" icon="moon" onClick={() => {}} />
           {authHeaderLink && (

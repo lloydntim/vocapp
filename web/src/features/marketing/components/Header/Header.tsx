@@ -18,7 +18,7 @@ function Header({ logo, navlinks, navButtons }: HeaderProps) {
 }
 
 const headerData: HeaderProps = {
-  logo: <Logo />,
+  logo: <Logo href="/" />,
   navlinks: navigationData.links,
   navButtons: [
     { type: 'iconButton', icon: 'moon', rank: 'secondary' },
