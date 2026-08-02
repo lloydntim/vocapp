@@ -38,7 +38,7 @@ const navClass =
 
 const navContainerClass = 'w-full max-w-[1180px] mx-auto px-6';
 const navInnerClass = 'flex items-center gap-5 h-17';
-const navLinksClass = 'hidden lg:flex lg:gap-1 lg:ml-[18px]';
+const navLinksClass = 'hidden md:flex md:gap-1 md:ml-[18px]';
 const navLinkClass =
   'px-3 py-2 rounded-lg text-sm font-medium text-[var(--text-muted)] no-underline transition-all duration-[var(--dur-fast)] ease-[var(--ease)]';
 const navRightClass = 'ml-auto flex items-center gap-2.5';
