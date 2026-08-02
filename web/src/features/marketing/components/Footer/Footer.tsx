@@ -42,9 +42,10 @@ interface FooterProps {
   };
 }
 const footerClass = 'border-t border-[var(--border)] py-11';
-const footerGridClass = 'flex gap-7.5 justify-between flex-wrap items-start';
-const footerBrandingClass = 'max-w-[280px]';
-const footerColumnsClass = 'flex gap-15 flex-wrap';
+const footerGridClass =
+  'flex flex-col gap-9 lg:flex-row lg:justify-between lg:items-start lg:gap-7.5';
+const footerBrandingClass = 'lg:max-w-[280px]';
+const footerColumnsClass = 'grid grid-cols-3 gap-4 sm:gap-6 lg:flex lg:gap-15 lg:flex-wrap';
 const footerBottomClass =
   'mt-9 pt-5 border-t border-[var(--border)] flex justify-between gap-4 flex-wrap text-sm text-[var(--text-dim)]';
 
