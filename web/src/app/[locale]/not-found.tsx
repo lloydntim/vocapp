@@ -21,7 +21,7 @@ const fadeInClass = 'animate-fade-in duration-(--dur) ease-(--ease)';
 function NotFound() {
   return (
     <div className={errorPageClass}>
-      <Header logo={<Logo />} />
+      <Header logo={<Logo href="/" />} />
       <main className={errorPageMainClass}>
         <div className={cn(errorPageContentClass, fadeInClass)}>
           <div className={errorCodeClass}>404</div>
