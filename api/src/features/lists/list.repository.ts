@@ -95,7 +95,7 @@ async function findVocabListByUser(
     ...list,
     total,
     mastered,
-    progress: total === 0 ? 0 : (mastered / total) * 100,
+    progress: total === 0 ? 0 : Math.round((mastered / total) * 100),
   };
 }
 
