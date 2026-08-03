@@ -4,16 +4,17 @@ import Form, { FormHandle, FormProps } from '@/components/ui/Form/Form';
 import { RefObject, Ref, useRef } from 'react';
 import { FieldValues } from 'react-hook-form';
 
-interface FormModalProps<T extends FieldValues, TOutput extends FieldValues = T> {
+interface FormModalProps<
+  T extends FieldValues,
+  TOutput extends FieldValues = T,
+> {
   ref: Ref<HTMLDialogElement>;
   modalProps: ModalProps;
   formProps: FormProps<T, TOutput>;
-  /** Exposes the form's imperative handle (setValue/getValues/trigger/reset)
-   * to the caller — needed when an action button living in the modal footer
-   * (outside the <form> element) has to read or write field values, e.g. a
-   * "Translate" button that fills in a field before the "Save" step. Pass a
-   * `useRef<FormHandle<T>>(null)` object; a plain object ref, not a callback,
-   * so it can double as the ref FormModal itself uses to reset the form. */
+  /**
+   * Gives buttons outside the form access to its values and actions.
+   * Pass a ref created with `useRef<FormHandle<T>>(null)`.
+   */
   formRef?: RefObject<FormHandle<T> | null>;
 }
 
@@ -31,10 +32,8 @@ function FormModal<T extends FieldValues, TOutput extends FieldValues = T>({
     modalProps.onModalClose?.();
   };
 
-  // The dialog can also close without going through onModalClose — e.g. a
-  // parent calling dialogRef.current?.close() directly after a successful
-  // save. The native `close` event fires either way, so reset the form
-  // there too (idempotent if handleModalClose already reset it).
+  // Reset the form whenever the dialog closes, including when it is closed
+  // directly by the parent. Resetting twice is safe.
   const handleNativeClose = () => {
     resolvedFormRef.current?.reset();
   };
