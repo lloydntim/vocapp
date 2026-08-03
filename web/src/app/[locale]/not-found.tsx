@@ -1,9 +1,16 @@
+import type { Metadata } from 'next';
 import Button from '@/components/ui/Button/Button';
 import Headline from '@/components/ui/Headline/Headline';
 import Logo from '@/components/ui/Logo/Logo';
 import Header from '@/features/marketing/components/Header/Header';
 import Text from '@/components/ui/Text/Text';
 import { cn } from '@/lib/utils';
+
+export const metadata: Metadata = {
+  title: 'Page not found',
+  description:
+    "The page you're looking for may have been moved, renamed, or never existed.",
+};
 
 const errorPageClass = 'min-h-screen flex flex-col bg-(--bg) text-(--text)';
 const errorPageMainClass = 'flex flex-1 items-center justify-center py-10 px-6';

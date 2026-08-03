@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Hero from '@/features/marketing/components/Hero/Hero';
 import LanguageStrip, {
   languageStripData,
@@ -14,6 +15,12 @@ import CtaSection, {
 import PracticeSection, {
   practiceSectionData,
 } from '@/features/marketing/components/PracticeSection/PracticeSection';
+
+export const metadata: Metadata = {
+  title: 'Vocabulary that actually sticks',
+  description:
+    'Create your own lists, drill them with fast flashcards, and watch your mastery climb — across French, Spanish, German, Italian and more.',
+};
 
 export default async function Page() {
   return (
