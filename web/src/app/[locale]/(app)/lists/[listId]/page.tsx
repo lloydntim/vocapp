@@ -36,6 +36,7 @@ import {
 } from '@/features/vocab-items/schemas';
 import { UseFormGetValues, UseFormSetValue } from 'react-hook-form';
 import { useMemo, useRef, useState } from 'react';
+import { FormHandle } from '@/components/ui/Form/Form';
 import { DataTableProps } from '@/features/app/components/DataTablePanel/DataTable/DataTable';
 import SkeletonContentHeader from '@/components/ui/Skeletons/SkeletonContentHeader/SkeletonContentHeader';
 import SkeletonVocabListSummaryBar from '@/components/ui/Skeletons/SkeletonVocabListSummaryBar/SkeletonVocabListSummaryBar';
@@ -191,9 +192,17 @@ function VocabListPage() {
   const { listId } = useParams<{ listId: string }>();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
+  const formRef = useRef<FormHandle<CreateListItemFormValues>>(null);
   const [itemFormValues, setItemFormValues] = useState<
     Partial<CreateListItemFormValues>
   >({});
+  // The sourceText a translation (or, in edit mode, the saved item itself)
+  // was produced for. When it stops matching the live sourceText, the
+  // footer button falls back to "Translate" instead of "Save" so a stale
+  // targetText can't be saved silently.
+  const [syncedSourceText, setSyncedSourceText] = useState<string | null>(
+    null,
+  );
 
   const translationMutation = useGetTranslations();
   const createItemMutation = useCreateListItem(listId);
@@ -233,6 +242,7 @@ function VocabListPage() {
       {
         onSuccess: ({ data: { translatedText } }) => {
           setValue('targetText', translatedText);
+          setSyncedSourceText(sourceText);
         },
       },
     );
@@ -245,6 +255,7 @@ function VocabListPage() {
 
   const handleIconClick = (item: VocabListItem) => {
     setEditingItem(item);
+    setSyncedSourceText(item.sourceText);
     dialogRef.current?.showModal();
   };
   const handleDeleteIconClick = (item: VocabListItem) => {
@@ -256,6 +267,7 @@ function VocabListPage() {
     dialogRef.current?.close();
     setEditingItem(null);
     setItemFormValues({});
+    setSyncedSourceText(null);
   };
 
   const addItemHandler = (data: CreateListItemPayload) => {
@@ -294,15 +306,38 @@ function VocabListPage() {
     ...createListItemFormProps,
     fields: buildFormFields(!!editingItem, languageNames, itemFormValues),
     values: toFormValues(editingItem),
-    hideSubmitButton: !!editingItem,
-    isSubmitting: translationMutation.isPending,
     onValuesChange: setItemFormValues,
     submitButtonHandler: onSubmit,
-    submitButtonClickHandler: onTranslate,
   };
 
-  const isSaveButtonDisabled =
-    !itemFormValues.sourceText || !itemFormValues.targetText;
+  // Stays "Translate" until targetText was produced for the sourceText
+  // currently in the field — see the syncedSourceText comment above.
+  const needsTranslation =
+    !itemFormValues.targetText ||
+    itemFormValues.sourceText !== syncedSourceText;
+
+  const saveButtonProps = needsTranslation
+    ? {
+        label: 'Translate',
+        icon: 'language',
+        rank: 'primary' as const,
+        type: 'button' as const,
+        disabled: !itemFormValues.sourceText || translationMutation.isPending,
+        loading: translationMutation.isPending,
+        onClick: () => {
+          if (!formRef.current) return;
+          onTranslate({
+            setValue: formRef.current.setValue,
+            getValues: formRef.current.getValues,
+          });
+        },
+      }
+    : {
+        ...modalProps.footer.saveButtonProps,
+        icon: editingItem ? 'square-pen' : modalProps.footer.saveButtonProps.icon,
+        label: editingItem ? 'Edit' : modalProps.footer.saveButtonProps.label,
+        loading: createItemMutation.isPending || updateItemMutation.isPending,
+      };
 
   return (
     <>
@@ -310,6 +345,7 @@ function VocabListPage() {
 
       <FormModal
         ref={dialogRef}
+        formRef={formRef}
         {...{ formProps }}
         modalProps={{
           ...modalProps,
@@ -318,18 +354,7 @@ function VocabListPage() {
           },
           footer: {
             ...modalProps.footer,
-            saveButtonProps: {
-              ...modalProps.footer.saveButtonProps,
-              icon: editingItem
-                ? 'square-pen'
-                : modalProps.footer.saveButtonProps.icon,
-              label: editingItem
-                ? 'Edit'
-                : modalProps.footer.saveButtonProps.label,
-              disabled: isSaveButtonDisabled,
-              loading:
-                createItemMutation.isPending || updateItemMutation.isPending,
-            },
+            saveButtonProps,
           },
           onModalClose: closeItemModal,
         }}
