@@ -126,7 +126,5 @@ export const buildFormFields = (
 export const createListItemFormProps = {
   id: FORM_ID,
   schema: createListItemSchema,
-  submitButtonText: 'Translate',
-  isSubmitButton: false,
-  hideSubmitButton: false,
+  hideSubmitButton: true,
 };

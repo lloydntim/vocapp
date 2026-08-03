@@ -1,33 +1,41 @@
 import Modal, { ModalProps } from '@/features/app/components/Modal/Modal';
 
 import Form, { FormHandle, FormProps } from '@/components/ui/Form/Form';
-import { Ref, useRef } from 'react';
+import { RefObject, Ref, useRef } from 'react';
 import { FieldValues } from 'react-hook-form';
 
-interface FormModalProps<T extends FieldValues, TOutput extends FieldValues = T> {
+interface FormModalProps<
+  T extends FieldValues,
+  TOutput extends FieldValues = T,
+> {
   ref: Ref<HTMLDialogElement>;
   modalProps: ModalProps;
   formProps: FormProps<T, TOutput>;
+  /**
+   * Gives buttons outside the form access to its values and actions.
+   * Pass a ref created with `useRef<FormHandle<T>>(null)`.
+   */
+  formRef?: RefObject<FormHandle<T> | null>;
 }
 
 function FormModal<T extends FieldValues, TOutput extends FieldValues = T>({
   ref,
   modalProps,
   formProps,
+  formRef,
 }: FormModalProps<T, TOutput>) {
-  const formRef = useRef<FormHandle<T>>(null);
+  const localFormRef = useRef<FormHandle<T>>(null);
+  const resolvedFormRef = formRef ?? localFormRef;
 
   const handleModalClose = () => {
-    formRef.current?.reset();
+    resolvedFormRef.current?.reset();
     modalProps.onModalClose?.();
   };
 
-  // The dialog can also close without going through onModalClose — e.g. a
-  // parent calling dialogRef.current?.close() directly after a successful
-  // save. The native `close` event fires either way, so reset the form
-  // there too (idempotent if handleModalClose already reset it).
+  // Reset the form whenever the dialog closes, including when it is closed
+  // directly by the parent. Resetting twice is safe.
   const handleNativeClose = () => {
-    formRef.current?.reset();
+    resolvedFormRef.current?.reset();
   };
 
   return (
@@ -39,7 +47,7 @@ function FormModal<T extends FieldValues, TOutput extends FieldValues = T>({
         onClose: handleNativeClose,
       }}
     >
-      <Form {...formProps} ref={formRef} />
+      <Form {...formProps} ref={resolvedFormRef} />
     </Modal>
   );
 }
