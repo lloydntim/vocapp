@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'VocApp — Vocabulary that actually sticks',
     description: siteDescription,
   },
